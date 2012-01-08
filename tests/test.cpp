@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include "biopp/bio_molecular/bio_molecular.h"
 
-TEST(FastaParserTest, TitleLoadSave)
+TEST(FastaParserTest, LoadSave)
 {
     const std::string file("SaveTest.txt");
     const std::string seqString("ATCGAATCGATCGTCG");
@@ -20,24 +20,7 @@ TEST(FastaParserTest, TitleLoadSave)
     fp.load_sequence(titleLoad, sequenceLoad);
 
     ASSERT_EQ(titleSave, titleLoad);
-}
-
-TEST(FastaParserTest, SequenceLoadSave)
-{
-    const std::string file("SaveTest.txt");
-    const std::string seqString("ATCGAATCGATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCG");
-
-    const NucSequence sequenceSave = seqString;
-    const std::string titleSave = "sequence 1";
-
-    NucSequence sequenceLoad;
-    std::string titleLoad;
-
-    FastaParser<NucSequence> fp(file);
-    fp.save_sequence(titleSave, sequenceSave);
-    fp.load_sequence(titleLoad, sequenceLoad);
-
-    ASSERT_EQ(sequenceLoad, sequenceSave);
+    ASSERT_EQ(sequenceSave, sequenceLoad);
 }
 
 void makeFileTest(std::string file_name)
@@ -55,32 +38,16 @@ void makeFileTest(std::string file_name)
     of.close();
 }
 
-TEST(FastaParserTest, LoadTitle)
+TEST(FastaParserTest, Load)
 {
     const std::string file("LoadTest.txt");
-    makeFileTest(file);
-
     NucSequence seq;
     std::string title;
-
+    makeFileTest(file);
     FastaParser<NucSequence> fp(file);
+
     fp.load_sequence(title, seq);
 
     ASSERT_EQ("SEQUENCE_1", title);
-
-}
-
-TEST(FastaParserTest, LoadSequence)
-{
-    const std::string file("LoadTest.txt");
-    makeFileTest(file);
-
-    FastaParser<NucSequence> fp(file);
-    std::string title;
-    NucSequence seq;
-
-    fp.load_sequence(title, seq);
-
     ASSERT_EQ("ATCGAATCGATCGTCG", seq.getString());
 }
-
