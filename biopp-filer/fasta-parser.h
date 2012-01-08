@@ -1,243 +1,128 @@
-//TODO: static LineType extractLineType(std::string& line);
-//procesarLineaVacia de todos
+/*
+fasta-parser.h: load and save sequences(NucSequence, PseudonucSequence, and AminoSequence)
+    Copyright (C) 2012 Facundo Muñoz FuDePAN
+
+    This file is part of Biopp-filer.
+
+    Aso is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Biopp is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Biopp.  If not, see <http://www.gnu.org/licenses/>.
+
+    NOTE: This file is in prototype stage, and is under active development.
+*/
 
 #ifndef FASTA_PARSER_H
 #define FASTA_PARSER_H
 
+#include "fsm.h"
 #include <string>
 #include <fstream>
-#include <stack>
 #include <mili/mili.h>
-
-using namespace mili;
-
 
 template<class Sequence>
 class FastaParser
 {
 private:
-    std::string file_name;
-    
-	enum LineType {lineaSecuencia, lineaDescriptiva, lineaVacia};
-	
-	static void removeComent(std::string& line)
-	{
-		size_t comentPosistion = line.find_first_of(";");
-		line = line.substr(0, comentPosistion);
-	}
+    const std::string file_name;
 
-	static void removeWhiteSpace(std::string& line)
-	{
-		line = trim(line);
-	}
+    enum LineType {lineaSecuencia, lineaDescriptiva, lineaVacia};
 
-	static LineType extractLineType(std::string& line)
-	{
-		LineType result;
-		removeComent(line);
-		removeWhiteSpace(line);
-		if(line[0] == '>')
-			result = lineaDescriptiva;
-		else if (line[0] == '\n')
-			result = lineaVacia;
-		else
-			result = lineaSecuencia;
+    static void removeComent(std::string& line)
+    {
+        size_t comentPosistion = line.find_first_of(";");
+        line = line.substr(0, comentPosistion);
+    }
 
-		return result;
-	}
+    static void removeWhiteSpace(std::string& line)
+    {
+        line = mili::trim(line);
+    }
+
+    static LineType extractLineType(std::string& line)
+    {
+        LineType result;
+
+        removeComent(line);
+        removeWhiteSpace(line);
+
+        if (line[0] == '>')
+            result = lineaDescriptiva;
+        else if (line[0] == '\n')
+            result = lineaVacia;
+        else
+            result = lineaSecuencia;
+
+        return result;
+    }
 
 public:
-    FastaParser(const std::string file_name) : 
-		file_name(file_name)
+    FastaParser(const std::string& file_name) :
+        file_name(file_name)
     {}
     ~FastaParser()
     {}
     void load_sequence(std::string& title, Sequence& seq);
-    //void save_sequence(const std::string& title, const Sequence& seq);
-};
-
-class FastaMachine
-{
-private:
-    class State
-    {
-    protected:
-        FastaMachine* fsm;
-    public:
-        State(FastaMachine* fm) : 
-			fsm(fm)
-        {}
-        virtual ~State()
-        {}
-        virtual const State* procesarLineaDescriptiva(char c) const = 0;
-        virtual const State* procesarLineaSecuencia(char c) const = 0;
-        virtual const State* procesarLineaVacia(char c) const = 0;
-    };
-
-    class EsperandoContenido : public State
-    {
-    public:
-        EsperandoContenido(FastaMachine* fm) : State(fm)
-        {}
-        const State* procesarLineaDescriptiva(char c) const;
-        const State* procesarLineaSecuencia(char c) const;
-        const State* procesarLineaVacia(char c) const;	};
-
-    class LeyendoContenido : public State
-    {
-    public:
-        LeyendoContenido(FastaMachine* fm) : State(fm)
-        {}
-        const State* procesarLineaDescriptiva(char c) const;
-        const State* procesarLineaSecuencia(char c) const;
-        const State* procesarLineaVacia(char c) const;
-	};
-
-    const State* const esperandoContenido;
-    const State* const leyendoContenido;
-    const State* current;
-    std::stack<const State*> stack_state;
-    std::string secuencia;
-    std::string descripcion;
-
-public:
-    FastaMachine() : 
-		esperandoContenido(new EsperandoContenido(this)),
-		leyendoContenido(new LeyendoContenido(this)),
-        current(esperandoContenido),
-        stack_state(),
-        secuencia(),
-        descripcion()
-    {}
-
-	void procesarLineaDescriptiva(char c);
-    void procesarLineaSecuencia(char c);
-    void procesarLineaVacia(char c);
-
-    std::string getSequence() const { return secuencia;  }
-    std::string getTitle()    const { return descripcion;}
+    void save_sequence(const std::string& title, const Sequence& seq);
 };
 
 template<class Sequence>
 void FastaParser<Sequence>::load_sequence(std::string& title, Sequence& seq)
 {
-        std::ifstream is(file_name.c_str());
-		std::string str;
-		LineType lt;
-        FastaMachine fsm;
-        while(std::getline(is, str))
+    std::ifstream is(file_name.c_str());
+    std::string str;
+    LineType lt;
+    FastaMachine fsm;
+
+    while (std::getline(is, str))
+    {
+        lt = extractLineType(str);
+        if (lt == lineaSecuencia)
         {
-			lt = extractLineType(str);
-			if (lt == lineaSecuencia)
-			{
-				for(size_t i = 0; i < str.size(); i++)
-					fsm.procesarLineaSecuencia(str[i]);
-			}
-			else if (lt == lineaDescriptiva)
-			{
-				for(size_t i = 0; i < str.size(); i++)
-					fsm.procesarLineaDescriptiva(str[i]);
-			}
-			else
-			{
-				for(size_t i = 0; i < str.size(); i++)
-					fsm.procesarLineaVacia(str[i]);
-			}
-		}
-
-		is.close();
-        seq = fsm.getSequence();
-        title = fsm.getTitle();
-}
-
-
-void FastaMachine::procesarLineaDescriptiva(char c)
-{
-    current = current->procesarLineaDescriptiva(c);
-	while (!stack_state.empty())
-    {
-        current = (stack_state.top())->procesarLineaDescriptiva(c);
-        stack_state.pop();
-    }
-}
-
-void FastaMachine::procesarLineaSecuencia(char c)
-{
-    current = current->procesarLineaSecuencia(c);
-	while (!stack_state.empty())
-    {
-        current = (stack_state.top())->procesarLineaSecuencia(c);
-        stack_state.pop();
-    }
-}
-
-void FastaMachine::procesarLineaVacia(char c)
-{
-    current = current->procesarLineaSecuencia(c);
-    while (!stack_state.empty())
-    {
-        current = (stack_state.top())->procesarLineaVacia(c);
-        stack_state.pop();
-    }
-}
-
-const FastaMachine::State* FastaMachine::EsperandoContenido::procesarLineaDescriptiva(char c) const
-{
-    const State* result_state = this;
-
-	if(c != '\n')
-    {
-        result_state = fsm->leyendoContenido;
-        fsm->stack_state.push(fsm->leyendoContenido);
+            for (size_t i = 0; i < str.size(); i++)
+                fsm.procesarLineaSecuencia(str[i]);
+        }
+        else if (lt == lineaDescriptiva)
+        {
+            for (size_t i = 0; i < str.size(); i++)
+                fsm.procesarLineaDescriptiva(str[i]);
+        }
     }
 
-    return result_state;
+    is.close();
+    seq = fsm.getSequence();
+    title = fsm.getTitle();
 }
 
-const FastaMachine::State* FastaMachine::EsperandoContenido::procesarLineaSecuencia(char c) const
+template<class Sequence>
+void FastaParser<Sequence>::save_sequence(const std::string& title, const Sequence& seq)
 {
-    const State* result_state = this;
+    static const size_t lineLimit(50);
+    const std::string sequence = seq.getString();
+    int currentCharNumber(0);
+    std::ofstream of(file_name.c_str());
 
-	if(c != '\n')
+    of << ">" << title << std::endl;
+
+    for (size_t i = 0; i < sequence.size(); i++)
     {
-        result_state = fsm->leyendoContenido;
-        fsm->stack_state.push(fsm->leyendoContenido);
+        of << sequence[i];
+        if (++currentCharNumber == lineLimit)
+        {
+            of << std::endl;
+            currentCharNumber = 0;
+        }
     }
 
-    return result_state;
+    of.close();
 }
 
-const FastaMachine::State* FastaMachine::EsperandoContenido::procesarLineaVacia(char c) const
-{
-    return this;
-}
-
-const FastaMachine::State* FastaMachine::LeyendoContenido::procesarLineaDescriptiva(char c) const
-{
-    const State* result_state = this;
-
-	if(c != '>')
-		fsm->descripcion += c;
-	if (c == '\n')
-        result_state = fsm->esperandoContenido;
-
-    return result_state;
-}
-
-const FastaMachine::State* FastaMachine::LeyendoContenido::procesarLineaSecuencia(char c) const
-{
-    const State* result_state = this;
-
-	if(c != '\n')
-        fsm->secuencia += c;
-	else
-		result_state = fsm->esperandoContenido;
-
-    return result_state;
-}
-
-const FastaMachine::State* FastaMachine::LeyendoContenido::procesarLineaVacia(char c) const
-{
-    return fsm->esperandoContenido;
-}
 #endif

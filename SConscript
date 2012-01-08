@@ -4,7 +4,7 @@ name = 'biopp-filer'
 inc = env.Dir('.')
 ext_inc = env.Dir ('biopp-filer')
 src = []
-deps = []
+deps = ['mili']
 CXXFLAGS = []
 
 env.Append (CXXFLAGS=CXXFLAGS, CFLAGS=CXXFLAGS)

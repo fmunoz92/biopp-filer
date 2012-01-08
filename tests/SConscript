@@ -3,7 +3,7 @@ Import ('env')
 name = 'biopp-filer'
 inc = env.Dir('.')
 src = env.Glob('*.cpp')
-deps = ['biopp-filer', 'biopp','gmock','gtest_main']
+deps = ['biopp-filer','mili', 'biopp','gmock','gtest_main']
 CXXFLAGS = ['-Wall', '-Wextra', '-Wno-sign-compare']
 
 env.Replace(CXXFLAGS=CXXFLAGS, CFLAGS=CXXFLAGS)
