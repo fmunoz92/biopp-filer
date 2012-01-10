@@ -4,18 +4,18 @@ fasta-parser.h: load and save sequences(NucSequence, PseudonucSequence, and Amin
 
     This file is part of Biopp-filer.
 
-    Aso is free software: you can redistribute it and/or modify
+    Biopp-filer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    Biopp is distributed in the hope that it will be useful,
+    Biopp-filer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Biopp.  If not, see <http://www.gnu.org/licenses/>.
+    along with Biopp-filer.  If not, see <http://www.gnu.org/licenses/>.
 
     NOTE: This file is in prototype stage, and is under active development.
 */
@@ -23,10 +23,10 @@ fasta-parser.h: load and save sequences(NucSequence, PseudonucSequence, and Amin
 #ifndef FASTA_PARSER_H
 #define FASTA_PARSER_H
 
-#include "fsm.h"
 #include <string>
 #include <fstream>
 #include <mili/mili.h>
+#include "fsm.h"
 
 template<class Sequence>
 class FastaParser
@@ -36,9 +36,9 @@ private:
 
     enum LineType {lineaSecuencia, lineaDescriptiva, lineaVacia};
 
-    static void removeComent(std::string& line)
+    static void removeComment(std::string& line)
     {
-        size_t comentPosistion = line.find_first_of(";");
+        const size_t comentPosistion = line.find_first_of(";");
         line = line.substr(0, comentPosistion);
     }
 
@@ -51,7 +51,7 @@ private:
     {
         LineType result;
 
-        removeComent(line);
+        removeComment(line);
         removeWhiteSpace(line);
 
         if (line[0] == '>')
@@ -65,17 +65,17 @@ private:
     }
 
 public:
-    FastaParser(const std::string& file_name) :
-        file_name(file_name)
+    FastaParser(const std::string& file_name)
+        : file_name(file_name)
     {}
     ~FastaParser()
     {}
-    void load_sequence(std::string& title, Sequence& seq);
-    void save_sequence(const std::string& title, const Sequence& seq);
+    void load_sequence(std::string& title, Sequence& seq) const;
+    void save_sequence(const std::string& title, const Sequence& seq) const;
 };
 
 template<class Sequence>
-void FastaParser<Sequence>::load_sequence(std::string& title, Sequence& seq)
+void FastaParser<Sequence>::load_sequence(std::string& title, Sequence& seq)  const
 {
     std::ifstream is(file_name.c_str());
     std::string str;
@@ -103,7 +103,7 @@ void FastaParser<Sequence>::load_sequence(std::string& title, Sequence& seq)
 }
 
 template<class Sequence>
-void FastaParser<Sequence>::save_sequence(const std::string& title, const Sequence& seq)
+void FastaParser<Sequence>::save_sequence(const std::string& title, const Sequence& seq) const
 {
     static const size_t lineLimit(50);
     const std::string sequence = seq.getString();

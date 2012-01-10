@@ -4,18 +4,18 @@ fsm.h: load and save sequences(NucSequence, PseudonucSequence, and AminoSequence
 
     This file is part of Biopp-filer.
 
-    Aso is free software: you can redistribute it and/or modify
+    Biopp-filer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    Biopp is distributed in the hope that it will be useful,
+    Biopp-filer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Biopp.  If not, see <http://www.gnu.org/licenses/>.
+    along with Biopp-filer.  If not, see <http://www.gnu.org/licenses/>.
 
     NOTE: This file is in prototype stage, and is under active development.
 */
@@ -36,8 +36,8 @@ private:
     protected:
         FastaMachine* const fsm;
     public:
-        State(FastaMachine* fm) :
-            fsm(fm)
+        State(FastaMachine* fm)
+            : fsm(fm)
         {}
         virtual ~State()
         {}
@@ -48,7 +48,8 @@ private:
     class EsperandoContenido : public State
     {
     public:
-        EsperandoContenido(FastaMachine* fm) : State(fm)
+        EsperandoContenido(FastaMachine* fm)
+            : State(fm)
         {}
         const State* procesarLineaDescriptiva(DataType c) const;
         const State* procesarLineaSecuencia(DataType c) const;
@@ -57,7 +58,8 @@ private:
     class LeyendoContenido : public State
     {
     public:
-        LeyendoContenido(FastaMachine* fm) : State(fm)
+        LeyendoContenido(FastaMachine* fm)
+            : State(fm)
         {}
         const State* procesarLineaDescriptiva(DataType c) const;
         const State* procesarLineaSecuencia(DataType c) const;
@@ -71,13 +73,13 @@ private:
     std::string descripcion;
 
 public:
-    FastaMachine() :
-        esperandoContenido(new EsperandoContenido(this)),
-        leyendoContenido(new LeyendoContenido(this)),
-        current(esperandoContenido),
-        stack_state(),
-        secuencia(),
-        descripcion()
+    FastaMachine()
+        : esperandoContenido(new EsperandoContenido(this)),
+          leyendoContenido(new LeyendoContenido(this)),
+          current(esperandoContenido),
+          stack_state(),
+          secuencia(),
+          descripcion()
     {}
 
     void procesarLineaDescriptiva(DataType c);

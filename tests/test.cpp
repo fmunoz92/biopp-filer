@@ -1,15 +1,15 @@
-#include <biopp-filer/fasta-parser.h>
 #include <string>
 #include <iostream>
 #include <gtest/gtest.h>
 #include "biopp/bio_molecular/bio_molecular.h"
+#include <biopp-filer/fasta-parser.h>
 
 TEST(FastaParserTest, LoadSave)
 {
     const std::string file("SaveTest.txt");
     const std::string seqString("ATCGAATCGATCGTCG");
 
-    const NucSequence sequenceSave = seqString;
+    const NucSequence sequenceSave = "ATCGAATCGATCGTCG";
     const std::string titleSave = "sequence 1";
 
     NucSequence sequenceLoad;
@@ -26,14 +26,6 @@ TEST(FastaParserTest, LoadSave)
 void makeFileTest(std::string file_name)
 {
     std::ofstream of(file_name.c_str());
-    /*
-     ;LineaVacia1
-     >SEQUENCE_1;comentario1
-    ATCGA; comentario2
-     ;lineaVacia2
-    ATCGATCG    ;comentario3
-    TCG
-    */
     of << " ;LineaVacia1 \n >SEQUENCE_1;comentario1 \nATCGA; comentario2 \n ;lineaVacia2\nATCGATCG    ;comentario3\nTCG";
     of.close();
 }
