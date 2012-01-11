@@ -28,6 +28,8 @@ fasta-parser.h: load and save sequences(NucSequence, PseudonucSequence, and Amin
 #include <mili/mili.h>
 #include "fsm.h"
 
+struct FileNotFound{};
+
 template<class Sequence>
 class FastaParser
 {
@@ -70,18 +72,20 @@ public:
     {}
     ~FastaParser()
     {}
-    void load_sequence(std::string& title, Sequence& seq) const;
+    void load_sequence(std::string& title, Sequence& seq) const throw (FileNotFound);
     void save_sequence(const std::string& title, const Sequence& seq) const;
 };
 
 template<class Sequence>
-void FastaParser<Sequence>::load_sequence(std::string& title, Sequence& seq)  const
+void FastaParser<Sequence>::load_sequence(std::string& title, Sequence& seq) const throw (FileNotFound)
 {
     std::ifstream is(file_name.c_str());
     std::string str;
     LineType lt;
     FastaMachine fsm;
 
+    if (!is.is_open())
+		throw FileNotFound();
     while (std::getline(is, str))
     {
         lt = extractLineType(str);
