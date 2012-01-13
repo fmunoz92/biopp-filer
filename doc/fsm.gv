@@ -1,0 +1,12 @@
+digraph finite_state_machine {
+	rankdir=LR;
+	size="8,5"
+	node [shape = doublecircle]; EsperandoContenido;
+	node [shape = circle];
+	EsperandoContenido -> LeyendoContenido   [ label = "lineaSecuencia()" ];
+	EsperandoContenido -> LeyendoContenido   [ label = "lineaDescripcion()" ];
+	LeyendoContenido   -> EsperandoContenido [ label = "lineaVacia()" ];
+	EsperandoContenido -> EsperandoContenido [ label = "lineaVacia()" ];
+	LeyendoContenido -> LeyendoContenido [ label = "lineaSecuencia()" ];
+	LeyendoContenido -> LeyendoContenido [ label = "lineaDescripcion()" ];
+}
