@@ -4,11 +4,28 @@
 
 \begin{document}
 	\begin{center}
-		{\large \textbf{\textsc{State transition table}}}\\\vspace{12mm}
+		{\large \textbf{\textsc{State transition table}}}\\\vspace{10mm}
         \begin{tabular}{ | l | l | l | l |}	\hline
                                & lineaVacia         & lineaDescripcion & lineaSecuencia				\\ \hline
             EsperandoContenido & EsperandoContenido & LeyendoContenido & LeyendoContenido   \\ \hline
             LeyendoContenido   & EsperandoContenido & LeyendoContenido & LeyendoContenido     \\ \hline
         \end{tabular}
     \end{center}
+	\begin{center}
+		{\large \textbf{\textsc{State table: LeyendoContenido}}}\\\vspace{10mm}
+        \begin{tabular}{ | l | l | l |}	\hline
+            State Name   & Condition/s         & Action/s\\ \hline
+            Current State &     lineaDescripcion(linea)  & asigna linea a descripcion    \\ \hline
+                          &     lineaSecuencia(linea)    & concatena linea a descripcion    \\ \hline
+            next state: EsperandoContenido   & lineaVacia(linea) & nada     \\ \hline
+        \end{tabular}\\\vspace{10mm}
+		{\large \textbf{\textsc{State table: EsperandoContenido}}}\\\vspace{10mm}
+        \begin{tabular}{ | l | l | l |}	\hline
+            State Name   & Condition/s         & Action/s\\ \hline
+            Current State &     lineaVacia(linea)  & nada    \\ \hline
+            next state: LeyendoContenido   & lineaDescripcion(linea) & cambia estado y ejecuta lineaDescripcion(linea)     \\ \hline
+                                           & lineaSecuencia(linea) & cambia estado y ejecuta lineaSecuencia(linea)     \\ \hline
+        \end{tabular}
+    \end{center}
+
 \end{document}
