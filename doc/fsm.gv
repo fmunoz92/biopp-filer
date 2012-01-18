@@ -1,24 +1,23 @@
 digraph finite_state_machine {
 	rankdir=LR;
 	size="15"
-	node [shape = doublecircle]; Start;
+	node [shape = doublecircle]; WaitingDescription;
 	node [shape = circle];
 
-    Start -> WaitingForSequence [ label = "lineaVacia/{seq.clear(), descripcion.clear()}" ];
-    Start -> WaitingDescription [ label = "lineaDescripcion/{seq.clear(), descripcion = linea}" ];
-    Start -> ReadingSequence    [ label = "lineaSecuencia/{seq = linea, descripcion.clear()}" ];
+    WaitingDescription -> WaitingForSequence [ label = "emptyLine/{description.clear()}" ];
+	WaitingDescription -> ReadingSequence    [ label = "lineDescription/{description = line}" ];
+	WaitingDescription -> ReadingSequence    [ label = "lineSequence/{seq = line}" ];
+	WaitingDescription -> Error              [ label = "end_of_file" ];
 
-	WaitingForSequence -> ReadingSequence    [ label = "lineaSecuencia/{seq += linea}" ];
-	WaitingForSequence -> WaitingDescription [ label = "lineaDescripcion /{descripcion += linea}" ];
-	WaitingForSequence -> WaitingForSequence [ label = "lineaVacia" ];
+	WaitingForSequence -> ReadingSequence    [ label = "lineSequence/{description.clear(), seq = line}" ];
+	WaitingForSequence -> Error              [ label = "lineDescription" ];
+	WaitingForSequence -> Error              [ label = "emptyLine" ];
+	WaitingForSequence -> Error              [ label = "end_of_file" ];
 
-    WaitingDescription -> Error              [ label = "lineaVacia" ];
-	WaitingDescription -> Error              [ label = "lineaDescripcion" ];
-	WaitingDescription -> ReadingSequence    [ label = "lineaSecuencia/{seq += linea}" ];
-
-	ReadingSequence    -> Exit               [ label = "lineaVacia" ];
-	ReadingSequence    -> Exit               [ label = "lineaDescripcion" ];
-	ReadingSequence    -> ReadingSequence    [ label = "lineaSecuencia/{seq += linea}" ];
+	ReadingSequence    -> Exit               [ label = "emptyLine" ];
+	ReadingSequence    -> Exit               [ label = "end_of_file" ];
+	ReadingSequence    -> ReadingSequence    [ label = "lineSequence/{seq += line}" ];
+    ReadingSequence    -> Exit               [ label = "lineDescription" ];
 
     
     Error-> Error [label = ""]
