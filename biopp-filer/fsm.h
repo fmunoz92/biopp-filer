@@ -24,10 +24,14 @@ fsm.h: load and save sequences(NucSequence, PseudonucSequence, and AminoSequence
 #define FSM_H
 
 #include <string>
-#include <stack>
+#include "bioppFilerException.h"
 
-typedef char DataType;
+typedef std::string DataType;
 
+
+DEFINE_SPECIFIC_EXCEPTION(FileError, BioppFilerException);
+
+template<class Sequence>
 class FastaMachine
 {
 private:
@@ -43,126 +47,185 @@ private:
         {}
         virtual const State* procesarLineaDescriptiva(DataType c) const = 0;
         virtual const State* procesarLineaSecuencia(DataType c) const = 0;
+        virtual const State* procesarLineaVacia() const = 0;
     };
 
-    class EsperandoContenido : public State
+    class WaitingForSequence : public State
     {
     public:
-        EsperandoContenido(FastaMachine* fm)
+        WaitingForSequence(FastaMachine* fm)
             : State(fm)
         {}
         const State* procesarLineaDescriptiva(DataType c) const;
         const State* procesarLineaSecuencia(DataType c) const;
+        const State* procesarLineaVacia() const;
     };
 
-    class LeyendoContenido : public State
+    class ReadingSequence : public State
     {
     public:
-        LeyendoContenido(FastaMachine* fm)
+        ReadingSequence(FastaMachine* fm)
             : State(fm)
         {}
         const State* procesarLineaDescriptiva(DataType c) const;
         const State* procesarLineaSecuencia(DataType c) const;
+        const State* procesarLineaVacia() const;
     };
 
-    const State* const esperandoContenido;
-    const State* const leyendoContenido;
+    class WaitingDescription : public State
+    {
+    public:
+        WaitingDescription(FastaMachine* fm)
+            : State(fm)
+        {}
+        const State* procesarLineaDescriptiva(DataType c) const;
+        const State* procesarLineaSecuencia(DataType c) const;
+        const State* procesarLineaVacia() const;
+    };
+
+    class Error : public State
+    {
+    public:
+        Error(FastaMachine* fm)
+            : State(fm)
+        {}
+        const State* procesarLineaDescriptiva(DataType c) const;
+        const State* procesarLineaSecuencia(DataType c) const;
+        const State* procesarLineaVacia() const;
+    };
+
+    const State* const waitingForSequence;
+    const State* const waitingDescription;
+    const State* const readingSequence;
+    const State* const error;
     const State* current;
-    std::stack<const State*> stack_state;
-    std::string secuencia;
-    std::string descripcion;
+    bool descripcionYaLeida;
+    Sequence& secuencia;
+    DataType& descripcion;
 
 public:
-    FastaMachine()
-        : esperandoContenido(new EsperandoContenido(this)),
-          leyendoContenido(new LeyendoContenido(this)),
-          current(esperandoContenido),
-          stack_state(),
-          secuencia(),
-          descripcion()
+    FastaMachine(Sequence& seq, DataType& des)
+        : waitingForSequence(new WaitingForSequence(this)),
+          waitingDescription(new WaitingDescription(this)),
+          readingSequence   (new ReadingSequence   (this)),
+          error             (new Error             (this)),
+          current(waitingForSequence),
+          descripcionYaLeida(false),
+          secuencia(seq),
+          descripcion(des)
     {}
 
     void procesarLineaDescriptiva(DataType c);
     void procesarLineaSecuencia(DataType c);
-
-    std::string getSequence() const
-    {
-        return secuencia;
-    }
-    std::string getTitle()    const
-    {
-        return descripcion;
-    }
+    void procesarLineaVacia(DataType c);
 };
 
-void FastaMachine::procesarLineaDescriptiva(DataType c)
+template<class Sequence>
+void FastaMachine<Sequence>::procesarLineaDescriptiva(DataType c)
 {
     current = current->procesarLineaDescriptiva(c);
-    while (!stack_state.empty())
-    {
-        current = (stack_state.top())->procesarLineaDescriptiva(c);
-        stack_state.pop();
-    }
 }
 
-void FastaMachine::procesarLineaSecuencia(DataType c)
+template<class Sequence>
+void FastaMachine<Sequence>::procesarLineaSecuencia(DataType c)
 {
     current = current->procesarLineaSecuencia(c);
-    while (!stack_state.empty())
+}
+
+template<class Sequence>
+void FastaMachine<Sequence>::procesarLineaVacia(DataType c)
+{
+    if (c.size() != 0)
+        throw FileError(string("linea no vacia"));
+    current = current->procesarLineaVacia();
+}
+
+template<class Sequence>
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForSequence::procesarLineaDescriptiva(DataType c) const
+{
+    return this->fsm->waitingDescription->procesarLineaDescriptiva(c); //o this->fsm->stack_state.push(this->fsm->waitingDescription);  ?
+}
+
+template<class Sequence>
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForSequence::procesarLineaSecuencia(DataType c) const
+{
+    return this->fsm->readingSequence->procesarLineaSecuencia(c);//o this->fsm->stack_state.push(this->fsm->readingSequence); ?
+}
+
+template<class Sequence>
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForSequence::procesarLineaVacia() const
+{
+    return this;
+}
+
+template<class Sequence>
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::ReadingSequence::procesarLineaDescriptiva(DataType c) const
+{
+    return this->fsm->error->procesarLineaDescriptiva(c);
+}
+
+template<class Sequence>
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::ReadingSequence::procesarLineaVacia() const
+{
+    return this->fsm->waitingForSequence;
+}
+
+template<class Sequence>
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::ReadingSequence::procesarLineaSecuencia(DataType c) const
+{
+    DataType tmp = this->fsm->secuencia.getString();
+    tmp += c;
+    this->fsm->secuencia = tmp;
+
+    return this;
+}
+
+template<class Sequence>
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingDescription::procesarLineaDescriptiva(DataType c) const
+{
+    const FastaMachine::State* result = this->fsm->error;
+
+    if (!this->fsm->descripcionYaLeida)
     {
-        current = (stack_state.top())->procesarLineaSecuencia(c);
-        stack_state.pop();
-    }
-}
-
-const FastaMachine::State* FastaMachine::EsperandoContenido::procesarLineaDescriptiva(DataType c) const
-{
-    const State* result_state = this;
-
-    if (c != '\n')
-    {
-        result_state = fsm->leyendoContenido;
-        fsm->stack_state.push(fsm->leyendoContenido);
+        this->fsm->descripcion = c;
+        result =  this->fsm->waitingForSequence;
+        this->fsm->descripcionYaLeida = true;
     }
 
-    return result_state;
+    return result;
 }
 
-const FastaMachine::State* FastaMachine::EsperandoContenido::procesarLineaSecuencia(DataType c) const
+template<class Sequence>
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingDescription::procesarLineaVacia() const
 {
-    const State* result_state = this;
-
-    if (c != '\n')
-    {
-        result_state = fsm->leyendoContenido;
-        fsm->stack_state.push(fsm->leyendoContenido);
-    }
-
-    return result_state;
+    return this->fsm->error;
 }
 
-const FastaMachine::State* FastaMachine::LeyendoContenido::procesarLineaDescriptiva(DataType c) const
+template<class Sequence>
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingDescription::procesarLineaSecuencia(DataType c) const
 {
-    const State* result_state = this;
-
-    if (c != '>')
-        fsm->descripcion += c;
-    if (c == '\n')
-        result_state = fsm->esperandoContenido;
-
-    return result_state;
+    return this->fsm->readingSequence->procesarLineaSecuencia(c);//othis->fsm->stack_state.push(this->fsm->readingSequence);
 }
 
-const FastaMachine::State* FastaMachine::LeyendoContenido::procesarLineaSecuencia(DataType c) const
+template<class Sequence>
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Error::procesarLineaDescriptiva(DataType c) const
 {
-    const State* result_state = this;
+    throw FileError(string("linea no procesada: ") + c);
+    return this;
+}
 
-    if (c != '\n')
-        fsm->secuencia += c;
-    else
-        result_state = fsm->esperandoContenido;
+template<class Sequence>
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Error::procesarLineaVacia() const
+{
+    throw FileError(string("linea vacia no procesada"));
+    return this;
+}
 
-    return result_state;
+template<class Sequence>
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Error::procesarLineaSecuencia(DataType c) const
+{
+    throw FileError(string("linea no procesada: ") + c);
+    return this;
 }
 
 #endif

@@ -26,9 +26,10 @@ fasta-parser.h: load and save sequences(NucSequence, PseudonucSequence, and Amin
 #include <string>
 #include <fstream>
 #include <mili/mili.h>
+#include "bioppFilerException.h"
 #include "fsm.h"
 
-struct FileNotFound{};
+DEFINE_SPECIFIC_EXCEPTION(FileNotFound, BioppFilerException);
 
 template<class Sequence>
 class FastaParser
@@ -36,12 +37,15 @@ class FastaParser
 private:
     const std::string file_name;
 
-    enum LineType {lineaSecuencia, lineaDescriptiva, lineaVacia};
-
     static void removeComment(std::string& line)
     {
         const size_t comentPosistion = line.find_first_of(";");
         line = line.substr(0, comentPosistion);
+    }
+
+    static void removeFirstChar(std::string& line)
+    {
+        line = line.substr(1, line.size());
     }
 
     static void removeWhiteSpace(std::string& line)
@@ -49,22 +53,7 @@ private:
         line = mili::trim(line);
     }
 
-    static LineType extractLineType(std::string& line)
-    {
-        LineType result;
-
-        removeComment(line);
-        removeWhiteSpace(line);
-
-        if (line[0] == '>')
-            result = lineaDescriptiva;
-        else if (line[0] == '\n')
-            result = lineaVacia;
-        else
-            result = lineaSecuencia;
-
-        return result;
-    }
+    void stimulate(FastaMachine<Sequence>& fsm, std::string& line) const;
 
 public:
     FastaParser(const std::string& file_name)
@@ -72,39 +61,44 @@ public:
     {}
     ~FastaParser()
     {}
-    void load_sequence(std::string& title, Sequence& seq) const throw (FileNotFound);
+    void load_sequence(std::string& title, Sequence& seq) const;
     void save_sequence(const std::string& title, const Sequence& seq) const;
 };
 
+
 template<class Sequence>
-void FastaParser<Sequence>::load_sequence(std::string& title, Sequence& seq) const throw (FileNotFound)
+void FastaParser<Sequence>::stimulate(FastaMachine<Sequence>& fsm, std::string& line) const
+{
+    removeComment(line);
+    removeWhiteSpace(line);
+
+    if (line[0] == '>')
+    {
+        removeFirstChar(line);
+        fsm.procesarLineaDescriptiva(line);
+    }
+    else if (line.size() == 0)
+        fsm.procesarLineaVacia(line);
+    else
+        fsm.procesarLineaSecuencia(line);
+}
+    
+template<class Sequence>
+void FastaParser<Sequence>::load_sequence(std::string& title, Sequence& seq) const
 {
     std::ifstream is(file_name.c_str());
-    std::string str;
-    LineType lt;
-    FastaMachine fsm;
+    std::string line;
+    FastaMachine<Sequence> fsm(seq, title);
 
     if (!is.is_open())
-		throw FileNotFound();
-    while (std::getline(is, str))
-    {
-        lt = extractLineType(str);
-        if (lt == lineaSecuencia)
-        {
-            for (size_t i = 0; i < str.size(); i++)
-                fsm.procesarLineaSecuencia(str[i]);
-        }
-        else if (lt == lineaDescriptiva)
-        {
-            for (size_t i = 0; i < str.size(); i++)
-                fsm.procesarLineaDescriptiva(str[i]);
-        }
-    }
+		throw FileNotFound(file_name);
+
+    while (std::getline(is, line))
+        stimulate(fsm, line);
 
     is.close();
-    seq = fsm.getSequence();
-    title = fsm.getTitle();
 }
+
 
 template<class Sequence>
 void FastaParser<Sequence>::save_sequence(const std::string& title, const Sequence& seq) const

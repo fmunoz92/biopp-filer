@@ -26,7 +26,7 @@ TEST(FastaParserTest, LoadSave)
 void makeFileTest(std::string file_name)
 {
     std::ofstream of(file_name.c_str());
-    of << " ;LineaVacia1 \n >SEQUENCE_1;comentario1 \nATCGA; comentario2 \n ;lineaVacia2\nATCGATCG    ;comentario3\nTCG";
+    of << ";comentario1\n >SEQUENCE_1\nATCGA; comentario2 \n ;lineaVacia2\nATCGATCG    ;comentario3\nTCG";
     of.close();
 }
 

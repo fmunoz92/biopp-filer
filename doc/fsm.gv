@@ -1,12 +1,16 @@
+//dot -Tpng fsmNuevo.gv -o FSM.png
 digraph finite_state_machine {
 	rankdir=LR;
-	size="8,5"
-	node [shape = doublecircle]; EsperandoContenido;
+	size="10"
+	node [shape = doublecircle]; WaitingForSequence;
 	node [shape = circle];
-	EsperandoContenido -> LeyendoContenido   [ label = "lineaSecuencia()" ];
-	EsperandoContenido -> LeyendoContenido   [ label = "lineaDescripcion()" ];
-	LeyendoContenido   -> EsperandoContenido [ label = "lineaVacia()" ];
-	EsperandoContenido -> EsperandoContenido [ label = "lineaVacia()" ];
-	LeyendoContenido -> LeyendoContenido [ label = "lineaSecuencia()" ];
-	LeyendoContenido -> LeyendoContenido [ label = "lineaDescripcion()" ];
+	WaitingForSequence -> ReadingSequence    [ label = "lineaSecuencia/{AddToStack, if !descripcionYaLeida -> descripcion = ''}" ];
+	WaitingForSequence -> WaitingDescription [ label = "lineaDescripcion /{AddToStack}" ];
+	WaitingForSequence -> WaitingForSequence [ label = "lineaVacia" ];
+	ReadingSequence    -> WaitingForSequence [ label = "lineaVacia" ];
+	ReadingSequence    -> Error              [ label = "lineaDescripcion" ];
+	WaitingDescription -> Error              [ label = "lineaVacia" ];
+	ReadingSequence    -> ReadingSequence    [ label = "lineaSecuencia/{seq += linea}" ];
+	WaitingDescription -> WaitingForSequence [ label = "lineaDescripcion AND !descripcionYaLeida/{descripcion = linea, descripcionYaLeida = TRUE}" ];
+	WaitingDescription -> Error              [ label = "lineaDescripcion AND descripcionYaLeida" ];
 }
