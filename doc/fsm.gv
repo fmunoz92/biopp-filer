@@ -1,15 +1,15 @@
 digraph finite_state_machine {
 	rankdir=LR;
 	size="15"
-	node [shape = doublecircle]; WaitingDescription;
+	node [shape = doublecircle]; WaitingForDescription;
 	node [shape = circle];
 
-    WaitingDescription -> WaitingForSequence [ label = "emptyLine/{description.clear()}" ];
-	WaitingDescription -> ReadingSequence    [ label = "lineDescription/{description = line}" ];
-	WaitingDescription -> ReadingSequence    [ label = "lineSequence/{seq = line}" ];
-	WaitingDescription -> Error              [ label = "end_of_file" ];
+    WaitingForDescription -> WaitingForDescription [ label = "emptyLine" ];
+	WaitingForDescription -> WaitingForSequence [ label = "lineDescription/{description = line}" ];
+	WaitingForDescription -> ReadingSequence    [ label = "lineSequence/{description.clear(), seq = line}" ];
+	WaitingForDescription -> Exit               [ label = "endOfFile" ];
 
-	WaitingForSequence -> ReadingSequence    [ label = "lineSequence/{description.clear(), seq = line}" ];
+	WaitingForSequence -> ReadingSequence    [ label = "lineSequence/{seq = line}" ];
 	WaitingForSequence -> Error              [ label = "lineDescription" ];
 	WaitingForSequence -> Error              [ label = "emptyLine" ];
 	WaitingForSequence -> Error              [ label = "end_of_file" ];
@@ -17,7 +17,7 @@ digraph finite_state_machine {
 	ReadingSequence    -> Exit               [ label = "emptyLine" ];
 	ReadingSequence    -> Exit               [ label = "end_of_file" ];
 	ReadingSequence    -> ReadingSequence    [ label = "lineSequence/{seq += line}" ];
-    ReadingSequence    -> Exit               [ label = "lineDescription" ];
+    ReadingSequence    -> Exit               [ label = "lineDescription/{StackStimulus.push(toPreviousLine)}" ];
 
     
     Error-> Error [label = ""]
