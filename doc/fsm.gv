@@ -4,22 +4,19 @@ digraph finite_state_machine {
 	node [shape = doublecircle]; WaitingForDescription;
 	node [shape = circle];
 
-    WaitingForDescription -> WaitingForDescription [ label = "emptyLine" ];
+    WaitingForDescription -> WaitingForDescription [ label = "lineEmpty" ];
 	WaitingForDescription -> WaitingForSequence [ label = "lineDescription/{description = line}" ];
-	WaitingForDescription -> ReadingSequence    [ label = "lineSequence/{description.clear(), seq = line}" ];
-	WaitingForDescription -> Exit               [ label = "endOfFile" ];
+	WaitingForDescription -> ReadingSequence    [ label = "lineSequence/{seq = line}" ];
 
 	WaitingForSequence -> ReadingSequence    [ label = "lineSequence/{seq = line}" ];
 	WaitingForSequence -> Error              [ label = "lineDescription" ];
-	WaitingForSequence -> Error              [ label = "emptyLine" ];
-	WaitingForSequence -> Error              [ label = "end_of_file" ];
+	WaitingForSequence -> Error              [ label = "lineEmpty" ];
 
-	ReadingSequence    -> Exit               [ label = "emptyLine" ];
-	ReadingSequence    -> Exit               [ label = "end_of_file" ];
+	ReadingSequence    -> Exit               [ label = "lineEmpty" ];
 	ReadingSequence    -> ReadingSequence    [ label = "lineSequence/{seq += line}" ];
-    ReadingSequence    -> Exit               [ label = "lineDescription/{StackStimulus.push(toPreviousLine)}" ];
-
+    ReadingSequence    -> Exit               [ label = "lineDescription/{saveDescriptionStimulus}" ];
     
     Error-> Error [label = ""]
+
     Exit -> Exit [label = ""]
 }

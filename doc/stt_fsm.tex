@@ -7,11 +7,12 @@
 		{\large \textbf{\textsc{State transition table}}}\\\vspace{10mm}
     \end{center}
         \begin{tabular}{ | l | l | l | l |}	\hline
-                                 & lineaVacia         & lineaDescripcion                       & lineaSecuencia				    \\ \hline
-            WaitingForSequence   & WaitingForSequence & AddToStack/ReadingDescription          & AddToStack/ReadingSequence     \\ \hline
-            ReadingSequence      & WaitingForSequence & Error                                  & seq += linea/ReadingSequence   \\ \hline
-            ReadingDescription   & WaitingForSequence & descripcion = linea/WaitingForSequence & AddToStack/ReadingSequence     \\ \hline
-            Error                & Error              & Error                                  & Error                          \\ \hline
+                                   & lineEmpty             & lineDescription                          & lineSequence				    \\ \hline
+			WaitingForDescription  & WaitingForDescription & WaitingForSequence/{descripcion = line}  & ReadingSequence/{seq = line}     \\ \hline
+            WaitingForSequence     & Error                 & Error                                    & ReadingSequence/{seq = line}   \\ \hline
+            ReadingSequence        & Exit                  & Exit/{saveDescriptionStimulus}           & ReadingSequence/{seq += linea}   \\ \hline
+            Error                  & Error                 & Error                                    & Error                          \\ \hline
+            Exit                   & Exit                  & Exit                                     & Exit                          \\ \hline
         \end{tabular}
 
 
