@@ -1,15 +1,26 @@
 digraph finite_state_machine {
 	rankdir=LR;
-	size="10"
-	node [shape = doublecircle]; WaitingForSequence;
+	size="15"
+	node [shape = doublecircle]; Start;
 	node [shape = circle];
+
+    Start -> WaitingForSequence [ label = "lineaVacia/{seq.clear(), descripcion.clear()}" ];
+    Start -> WaitingDescription [ label = "lineaDescripcion/{seq.clear(), descripcion = linea}" ];
+    Start -> ReadingSequence    [ label = "lineaSecuencia/{seq = linea, descripcion.clear()}" ];
+
 	WaitingForSequence -> ReadingSequence    [ label = "lineaSecuencia/{seq += linea}" ];
 	WaitingForSequence -> WaitingDescription [ label = "lineaDescripcion /{descripcion += linea}" ];
 	WaitingForSequence -> WaitingForSequence [ label = "lineaVacia" ];
-	ReadingSequence    -> WaitingForSequence [ label = "lineaVacia" ];
-	ReadingSequence    -> WaitingDescription [ label = "lineaDescripcion" ];
-	WaitingDescription -> Error              [ label = "lineaVacia" ];
+
+    WaitingDescription -> Error              [ label = "lineaVacia" ];
+	WaitingDescription -> Error              [ label = "lineaDescripcion" ];
+	WaitingDescription -> ReadingSequence    [ label = "lineaSecuencia/{seq += linea}" ];
+
+	ReadingSequence    -> Exit               [ label = "lineaVacia" ];
+	ReadingSequence    -> Exit               [ label = "lineaDescripcion" ];
 	ReadingSequence    -> ReadingSequence    [ label = "lineaSecuencia/{seq += linea}" ];
-	WaitingDescription -> WaitingDescription [ label = "lineaDescripcion/{descripcion += linea}" ];
-	WaitingDescription -> ReadingSequence [ label = "lineaSecuencia/{seq += linea}" ];
+
+    
+    Error-> Error [label = ""]
+    Exit -> Exit [label = ""]
 }
