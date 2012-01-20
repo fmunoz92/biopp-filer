@@ -25,7 +25,9 @@ fasta-saver.h: load and save sequences(NucSequence, PseudonucSequence, and Amino
 
 #include <string>
 #include <fstream>
-#include "bioppFilerException.h"
+
+namespace bioppFiler
+{
 
 template<class Sequence>
 class FastaSaver
@@ -101,4 +103,5 @@ void FastaSaver<Sequence>::save_next_sequence(const Sequence& seq)
         os << std::endl;
 }
 
+}
 #endif

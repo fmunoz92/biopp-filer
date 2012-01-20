@@ -2,9 +2,9 @@
 #include <iostream>
 #include <gtest/gtest.h>
 #include <biopp/biopp.h>
-#include <biopp-filer/fasta-parser.h>
-#include <biopp-filer/fasta-saver.h>
+#include <biopp-filer/bioppFiler.h>
 
+using namespace bioppFiler;
 
 TEST(FastaParserTest, LoadSave)
 {

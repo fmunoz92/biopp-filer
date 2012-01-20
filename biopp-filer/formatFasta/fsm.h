@@ -24,7 +24,9 @@ fsm.h: load and save sequences(NucSequence, PseudonucSequence, and AminoSequence
 #define FSM_H
 
 #include <string>
-#include "bioppFilerException.h"
+
+namespace bioppFiler
+{
 
 typedef std::string DataType;
 
@@ -168,6 +170,8 @@ public:
         des = description;
     }
 };
+
+
 
 template<class Sequence>
 void FastaMachine<Sequence>::lineDescription(DataType c)
@@ -313,4 +317,5 @@ inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Exi
     return this;
 }
 
+}
 #endif
