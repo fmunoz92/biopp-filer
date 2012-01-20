@@ -143,6 +143,15 @@ public:
           running(true)
     {}
 
+    ~FastaMachine()
+    {
+		delete waitingForSequence;
+		delete waitingForDescription;
+		delete readingSequence;
+		delete error;
+		delete exit;
+	}
+
     void lineDescription(DataType c);
     void lineSequence(DataType c);
     void lineEmpty(DataType c);
