@@ -44,8 +44,8 @@ private:
         {}
         virtual ~State()
         {}
-        virtual const State* lineDescription(DataType c) const = 0;
-        virtual const State* lineSequence(DataType c) const = 0;
+        virtual const State* lineDescription(DataType line) const = 0;
+        virtual const State* lineSequence(DataType line) const = 0;
         virtual const State* lineEmpty() const = 0;
     };
 
@@ -55,8 +55,8 @@ private:
         WaitingForSequence(FastaMachine* fm)
             : State(fm)
         {}
-        const State* lineDescription(DataType c) const;
-        const State* lineSequence(DataType c) const;
+        const State* lineDescription(DataType line) const;
+        const State* lineSequence(DataType line) const;
         const State* lineEmpty() const;
     };
 
@@ -66,8 +66,8 @@ private:
         ReadingSequence(FastaMachine* fm)
             : State(fm)
         {}
-        const State* lineDescription(DataType c) const;
-        const State* lineSequence(DataType c) const;
+        const State* lineDescription(DataType line) const;
+        const State* lineSequence(DataType line) const;
         const State* lineEmpty() const;
     };
 
@@ -77,8 +77,8 @@ private:
         WaitingForDescription(FastaMachine* fm)
             : State(fm)
         {}
-        const State* lineDescription(DataType c) const;
-        const State* lineSequence(DataType c) const;
+        const State* lineDescription(DataType line) const;
+        const State* lineSequence(DataType line) const;
         const State* lineEmpty() const;
     };
 
@@ -88,8 +88,8 @@ private:
         Error(FastaMachine* fm)
             : State(fm)
         {}
-        const State* lineDescription(DataType c) const;
-        const State* lineSequence(DataType c) const;
+        const State* lineDescription(DataType line) const;
+        const State* lineSequence(DataType line) const;
         const State* lineEmpty() const;
     };
 
@@ -99,8 +99,8 @@ private:
         Exit(FastaMachine* fm)
             : State(fm)
         {}
-        const State* lineDescription(DataType c) const;
-        const State* lineSequence(DataType c) const;
+        const State* lineDescription(DataType line) const;
+        const State* lineSequence(DataType line) const;
         const State* lineEmpty() const;
     };
 
@@ -147,16 +147,16 @@ public:
 
     ~FastaMachine()
     {
-		delete waitingForSequence;
-		delete waitingForDescription;
-		delete readingSequence;
-		delete error;
-		delete exit;
-	}
+        delete waitingForSequence;
+        delete waitingForDescription;
+        delete readingSequence;
+        delete error;
+        delete exit;
+    }
 
-    void lineDescription(DataType c);
-    void lineSequence(DataType c);
-    void lineEmpty(DataType c);
+    void lineDescription(DataType line);
+    void lineSequence(DataType line);
+    void lineEmpty(DataType line);
     void reset();
 
     bool isRunning() const
@@ -174,24 +174,24 @@ public:
 
 
 template<class Sequence>
-void FastaMachine<Sequence>::lineDescription(DataType c)
+void FastaMachine<Sequence>::lineDescription(DataType line)
 {
     runStackStimulus();
-    current = current->lineDescription(c);
+    current = current->lineDescription(line);
 }
 
 template<class Sequence>
-void FastaMachine<Sequence>::lineSequence(DataType c)
+void FastaMachine<Sequence>::lineSequence(DataType line)
 {
     runStackStimulus();
-    current = current->lineSequence(c);
+    current = current->lineSequence(line);
 }
 
 template<class Sequence>
-void FastaMachine<Sequence>::lineEmpty(DataType c)
+void FastaMachine<Sequence>::lineEmpty(DataType line)
 {
     runStackStimulus();
-    if (c.size() != 0)
+    if (line.size() != 0)
         throw FileError(std::string("non-empty line"));
     current = current->lineEmpty();
 }
@@ -208,15 +208,15 @@ void FastaMachine<Sequence>::reset()
 
 
 template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForSequence::lineDescription(DataType c) const
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForSequence::lineDescription(DataType line) const
 {
     return this->fsm->error;
 }
 
 template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForSequence::lineSequence(DataType c) const
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForSequence::lineSequence(DataType line) const
 {
-    this->fsm->sequence = c;
+    this->fsm->sequence = line;
     return this->fsm->readingSequence;
 }
 
@@ -227,11 +227,11 @@ inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Wai
 }
 
 template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::ReadingSequence::lineDescription(DataType c) const
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::ReadingSequence::lineDescription(DataType line) const
 {
     this->fsm->running = false;
     this->fsm->previousDescripcion = true;
-    this->fsm->linePreviousDescripcion = c;
+    this->fsm->linePreviousDescripcion = line;
 
     return this->fsm->exit;
 }
@@ -244,19 +244,19 @@ inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Rea
 }
 
 template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::ReadingSequence::lineSequence(DataType c) const
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::ReadingSequence::lineSequence(DataType line) const
 {
     DataType tmp = this->fsm->sequence.getString();
-    tmp += c;
+    tmp += line;
     this->fsm->sequence = tmp;
 
     return this;
 }
 
 template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForDescription::lineDescription(DataType c) const
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForDescription::lineDescription(DataType line) const
 {
-    this->fsm->description = c;
+    this->fsm->description = line;
 
     return this->fsm->waitingForSequence;
 }
@@ -268,17 +268,17 @@ inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Wai
 }
 
 template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForDescription::lineSequence(DataType c) const
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForDescription::lineSequence(DataType line) const
 {
-    this->fsm->sequence = c;
+    this->fsm->sequence = line;
 
     return this->fsm->readingSequence;
 }
 
 template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Error::lineDescription(DataType c) const
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Error::lineDescription(DataType line) const
 {
-    throw FileError(string("State Error ") + c);
+    throw FileError(string("State Error ") + line);
     return this;
 }
 
@@ -290,16 +290,16 @@ inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Err
 }
 
 template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Error::lineSequence(DataType c) const
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Error::lineSequence(DataType line) const
 {
-    throw FileError(string("State Error ") + c);
+    throw FileError(string("State Error ") + line);
     return this;
 }
 
 template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Exit::lineDescription(DataType c) const
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Exit::lineDescription(DataType line) const
 {
-    throw FileError(string("State Exit ") + c);
+    throw FileError(string("State Exit ") + line);
     return this;
 }
 
@@ -311,9 +311,9 @@ inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Exi
 }
 
 template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Exit::lineSequence(DataType c) const
+inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Exit::lineSequence(DataType line) const
 {
-    throw FileError(string("State Exit ") + c);
+    throw FileError(string("State Exit ") + line);
     return this;
 }
 

@@ -15,5 +15,4 @@ DEFINE_SPECIFIC_EXCEPTION(FileError, BioppFilerException);
 #include "formatFasta/fasta-saver.h"
 #include "formatFasta/fasta-parser.h"
 
-
 #endif
