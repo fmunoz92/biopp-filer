@@ -15,8 +15,4 @@ digraph finite_state_machine {
 	ReadingSequence    -> Exit               [ label = "lineEmpty" ];
 	ReadingSequence    -> ReadingSequence    [ label = "lineSequence/{seq += line}" ];
     ReadingSequence    -> Exit               [ label = "lineDescription/{saveDescriptionStimulus}" ];
-    
-    Error-> Error [label = ""]
-
-    Exit -> Exit [label = ""]
 }
