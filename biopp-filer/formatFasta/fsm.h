@@ -112,23 +112,26 @@ private:
     const State* const exit;
     const State* current;
 
-    bool previousDescripcion;
-    DataType linePreviousDescripcion;
+    bool previousDescription;
+    DataType linePreviousDescription;
 
+	void saveStimulusDescription(const DataType& line)
+	{
+		previousDescription = true;
+		linePreviousDescription = line;
+	}
 
     void runStackStimulus()
     {
-        if (previousDescripcion)
+        if (previousDescription)
         {
-            current = current->lineDescription(linePreviousDescripcion);
-            previousDescripcion = false;
+            current = current->lineDescription(linePreviousDescription);
+            previousDescription = false;
         }
     }
 
     Sequence sequence;
     DataType description;
-
-    bool running;
 
 public:
 
@@ -139,11 +142,10 @@ public:
           error(new Error(this)),
           exit(new Exit(this)),
           current(waitingForDescription),
-          previousDescripcion(false),
-          linePreviousDescripcion(),
+          previousDescription(false),
+          linePreviousDescription(),
           sequence(),
-          description(),
-          running(true)
+          description()
     {}
 
     ~FastaMachine()
@@ -162,7 +164,7 @@ public:
 
     bool isRunning() const
     {
-        return running;
+        return (current != exit) && (current != error);//is valid?
     }
 
     void getSequence(Sequence& seq, DataType& des) const
@@ -205,7 +207,6 @@ void FastaMachine<Sequence>::reset()
 template<class Sequence>
 inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::State::reset() const
 {
-	this->fsm->running = true;
 	this->fsm->sequence.clear();
 	this->fsm->description.clear();
 	
@@ -234,9 +235,7 @@ inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Wai
 template<class Sequence>
 inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::ReadingSequence::lineDescription(const DataType& line) const
 {
-    this->fsm->running = false;
-    this->fsm->previousDescripcion = true;
-    this->fsm->linePreviousDescripcion = line;
+	this->fsm->saveStimulusDescription(line);
 
     return this->fsm->exit;
 }
@@ -244,7 +243,6 @@ inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Rea
 template<class Sequence>
 inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::ReadingSequence::lineEmpty() const
 {
-    this->fsm->running = false;
     return this->fsm->exit;
 }
 
