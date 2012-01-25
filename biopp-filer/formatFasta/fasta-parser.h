@@ -82,20 +82,20 @@ bool FastaParser<Sequence>::get_next_sequence(std::string& title, Sequence& seq)
     fsm.reset();
 
     while (fsm.isRunning() && std::getline(is, line))
-	{
-		removeComment(line);
-		removeWhiteSpace(line);
+    {
+        removeComment(line);
+        removeWhiteSpace(line);
 
-		if (line[0] == '>')
-		{
-			removeFirstChar(line);
-			fsm.lineDescription(line);
-		}
-		else if (line.size() == 0)
-			fsm.lineEmpty(line);
-		else
-			fsm.lineSequence(line);
-	}
+        if (line[0] == '>')
+        {
+            removeFirstChar(line);
+            fsm.lineDescription(line);
+        }
+        else if (line.size() == 0)
+            fsm.lineEmpty(line);
+        else
+            fsm.lineSequence(line);
+    }
 
     fsm.getSequence(seq, title);
 

@@ -115,11 +115,11 @@ private:
     bool previousDescription;
     DataType linePreviousDescription;
 
-	void saveStimulusDescription(const DataType& line)
-	{
-		previousDescription = true;
-		linePreviousDescription = line;
-	}
+    void saveStimulusDescription(const DataType& line)
+    {
+        previousDescription = true;
+        linePreviousDescription = line;
+    }
 
     void runStackStimulus()
     {
@@ -207,11 +207,11 @@ void FastaMachine<Sequence>::reset()
 template<class Sequence>
 inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::State::reset() const
 {
-	this->fsm->sequence.clear();
-	this->fsm->description.clear();
-	
-	return this->fsm->waitingForDescription;
-}        
+    this->fsm->sequence.clear();
+    this->fsm->description.clear();
+
+    return this->fsm->waitingForDescription;
+}
 
 template<class Sequence>
 inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForSequence::lineDescription(const DataType& line) const
@@ -235,7 +235,7 @@ inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Wai
 template<class Sequence>
 inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::ReadingSequence::lineDescription(const DataType& line) const
 {
-	this->fsm->saveStimulusDescription(line);
+    this->fsm->saveStimulusDescription(line);
 
     return this->fsm->exit;
 }
