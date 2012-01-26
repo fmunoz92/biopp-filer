@@ -1,4 +1,5 @@
 #include <string>
+#include <vector>
 #include <iostream>
 #include <gtest/gtest.h>
 #include <biopp/biopp.h>
@@ -6,19 +7,81 @@
 
 using namespace bioppFiler;
 
-TEST(FastaParserTest, LoadSave)
+TEST(FastaFormatTest, LoadSave)
 {
-    const std::string file("SaveTest.txt");
-    const std::string seqString1("ATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCG");
-    const std::string seqString2("ATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCG");
-    const std::string seqString3("ATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCG");
+    const std::string file("LoadSave.txt");
 
-    const biopp::NucSequence sequenceSave1 = seqString1;
-    const biopp::NucSequence sequenceSave2 = seqString2;
-    const biopp::NucSequence sequenceSave3 = seqString2;
+	std::list<biopp::NucSequence> lSeqSaver;
+	std::list<biopp::NucSequence> lSeqLoader;
 
-    const std::string titleSave1 = "sequence 1";
-    const std::string titleSave2 = "sequence 2";
+	std::list<std::string> lDesSaver;
+	std::list<std::string> lDesLoader;
+	
+	/******************Save****************************/
+
+    FastaSaver<biopp::NucSequence> fs(file);
+    
+    lSeqSaver.push_back(biopp::NucSequence("ATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCG"));
+	lSeqSaver.push_back(biopp::NucSequence("CTCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCG"));
+	lSeqSaver.push_back(biopp::NucSequence("TATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCG"));
+	
+	lDesSaver.push_back(std::string("sequence 1"));
+	lDesSaver.push_back(std::string("sequence 2"));
+	lDesSaver.push_back(std::string("sequence 3"));
+
+	std::list<biopp::NucSequence>::iterator itSeq = lSeqSaver.begin();
+	std::list<std::string>::iterator itDes = lDesSaver.begin();
+	for( ; itSeq != lSeqSaver.end(); itSeq++, itDes++)
+	{
+		fs.save_next_sequence(*itDes, *itSeq);
+	}
+
+	/*******************Load**************************/
+
+	FastaParser<biopp::NucSequence> fp(file);
+
+	biopp::NucSequence sequenceLoad;
+	std::string titleLoad;
+	while(fp.get_next_sequence(titleLoad, sequenceLoad))
+	{
+		lSeqLoader.push_back(sequenceLoad);
+		lDesLoader.push_back(titleLoad);
+	}
+
+	/*******************Compare************************/
+	std::list<biopp::NucSequence>::iterator itSeqSaver  = lSeqSaver.begin();
+	std::list<biopp::NucSequence>::iterator itSeqLoader = lSeqLoader.begin();
+	
+	std::list<std::string>::iterator        itDesSaver  = lDesSaver.begin();
+	std::list<std::string>::iterator        itDesLoader = lDesLoader.begin();
+
+	for( ; itSeq != lSeqSaver.end(); itSeqSaver++, itDesSaver++, itSeqLoader++, itDesLoader++)
+	{
+		ASSERT_EQ(*itSeqSaver, *itSeqLoader);
+		ASSERT_EQ(*itDesSaver, *itDesLoader);
+	}
+}
+
+TEST(FastaFormatTest, LoadSaveWithoutDescription)
+{
+    const std::string file("LoadSaveWithoutDescription.txt");
+
+	/******************Save****************************/
+    const biopp::NucSequence sequenceSave1("ATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCG");
+    const biopp::NucSequence sequenceSave2("ATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCG");
+    const biopp::NucSequence sequenceSave3("ATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCG");
+
+    const std::string titleSave1("sequence 1");
+    const std::string titleSave2("sequence 2");
+
+    FastaSaver<biopp::NucSequence>  fs(file);
+
+    fs.save_next_sequence(titleSave1, sequenceSave1);
+    fs.save_next_sequence(titleSave2, sequenceSave2);
+    fs.save_next_sequence(sequenceSave3);//without description
+
+	/*******************Load**************************/
+    FastaParser<biopp::NucSequence> fp(file);
 
     biopp::NucSequence sequenceLoad1;
     biopp::NucSequence sequenceLoad2;
@@ -28,17 +91,11 @@ TEST(FastaParserTest, LoadSave)
     std::string titleLoad2;
     std::string titleLoad3;
 
-    FastaSaver<biopp::NucSequence>  fs(file);
-    FastaParser<biopp::NucSequence> fp(file);
-
-    fs.save_next_sequence(titleSave1, sequenceSave1);
-    fs.save_next_sequence(titleSave2, sequenceSave2);
-    fs.save_next_sequence(sequenceSave3);
-
     fp.get_next_sequence(titleLoad1, sequenceLoad1);
     fp.get_next_sequence(titleLoad2, sequenceLoad2);
     fp.get_next_sequence(titleLoad3, sequenceLoad3);
 
+	/*******************Compare************************/
     ASSERT_EQ(sequenceSave1, sequenceLoad1);
     ASSERT_EQ(titleSave1, titleLoad1);
 
@@ -51,9 +108,9 @@ TEST(FastaParserTest, LoadSave)
 
 
 
-TEST(FastaParserTest, Load)
+TEST(FastaFormatTest, Load)
 {
-    const std::string file("LoadTest.txt");
+    const std::string file("Load.txt");
 
     std::ofstream of(file.c_str());
     of << ">SEQUENCE_1\nATCGA; comentario2 \n ATCGATCG;comentario3\nTCG\n>sequence_2\nAGGTG\nAGGTG\nAGGTG\n\nATTG\n";
@@ -73,8 +130,10 @@ TEST(FastaParserTest, Load)
 
     biopp::NucSequence seq1;
     std::string title1;
+
     biopp::NucSequence seq2;
     std::string title2;
+
     biopp::NucSequence seq3;
     std::string title3;
 
