@@ -11,62 +11,62 @@ TEST(FastaFormatTest, LoadSave)
 {
     const std::string file("LoadSave.txt");
 
-	std::list<biopp::NucSequence> lSeqSaver;
-	std::list<biopp::NucSequence> lSeqLoader;
+    std::list<biopp::NucSequence> lSeqSaver;
+    std::list<biopp::NucSequence> lSeqLoader;
 
-	std::list<std::string> lDesSaver;
-	std::list<std::string> lDesLoader;
-	
-	/******************Save****************************/
+    std::list<std::string> lDesSaver;
+    std::list<std::string> lDesLoader;
+
+    /******************Save****************************/
 
     FastaSaver<biopp::NucSequence> fs(file);
-    
+
     lSeqSaver.push_back(biopp::NucSequence("ATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCG"));
-	lSeqSaver.push_back(biopp::NucSequence("CTCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCG"));
-	lSeqSaver.push_back(biopp::NucSequence("TATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCG"));
-	
-	lDesSaver.push_back(std::string("sequence 1"));
-	lDesSaver.push_back(std::string("sequence 2"));
-	lDesSaver.push_back(std::string("sequence 3"));
+    lSeqSaver.push_back(biopp::NucSequence("CTCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCG"));
+    lSeqSaver.push_back(biopp::NucSequence("TATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCG"));
 
-	std::list<biopp::NucSequence>::iterator itSeq = lSeqSaver.begin();
-	std::list<std::string>::iterator itDes = lDesSaver.begin();
-	for( ; itSeq != lSeqSaver.end(); itSeq++, itDes++)
-	{
-		fs.save_next_sequence(*itDes, *itSeq);
-	}
+    lDesSaver.push_back(std::string("sequence 1"));
+    lDesSaver.push_back(std::string("sequence 2"));
+    lDesSaver.push_back(std::string("sequence 3"));
 
-	/*******************Load**************************/
+    std::list<biopp::NucSequence>::iterator itSeq = lSeqSaver.begin();
+    std::list<std::string>::iterator itDes = lDesSaver.begin();
+    for (; itSeq != lSeqSaver.end(); itSeq++, itDes++)
+    {
+        fs.save_next_sequence(*itDes, *itSeq);
+    }
 
-	FastaParser<biopp::NucSequence> fp(file);
+    /*******************Load**************************/
 
-	biopp::NucSequence sequenceLoad;
-	std::string titleLoad;
-	while(fp.get_next_sequence(titleLoad, sequenceLoad))
-	{
-		lSeqLoader.push_back(sequenceLoad);
-		lDesLoader.push_back(titleLoad);
-	}
+    FastaParser<biopp::NucSequence> fp(file);
 
-	/*******************Compare************************/
-	std::list<biopp::NucSequence>::iterator itSeqSaver  = lSeqSaver.begin();
-	std::list<biopp::NucSequence>::iterator itSeqLoader = lSeqLoader.begin();
-	
-	std::list<std::string>::iterator        itDesSaver  = lDesSaver.begin();
-	std::list<std::string>::iterator        itDesLoader = lDesLoader.begin();
+    biopp::NucSequence sequenceLoad;
+    std::string titleLoad;
+    while (fp.get_next_sequence(titleLoad, sequenceLoad))
+    {
+        lSeqLoader.push_back(sequenceLoad);
+        lDesLoader.push_back(titleLoad);
+    }
 
-	for( ; itSeq != lSeqSaver.end(); itSeqSaver++, itDesSaver++, itSeqLoader++, itDesLoader++)
-	{
-		ASSERT_EQ(*itSeqSaver, *itSeqLoader);
-		ASSERT_EQ(*itDesSaver, *itDesLoader);
-	}
+    /*******************Compare************************/
+    std::list<biopp::NucSequence>::iterator itSeqSaver  = lSeqSaver.begin();
+    std::list<biopp::NucSequence>::iterator itSeqLoader = lSeqLoader.begin();
+
+    std::list<std::string>::iterator        itDesSaver  = lDesSaver.begin();
+    std::list<std::string>::iterator        itDesLoader = lDesLoader.begin();
+
+    for (; itSeq != lSeqSaver.end(); itSeqSaver++, itDesSaver++, itSeqLoader++, itDesLoader++)
+    {
+        ASSERT_EQ(*itSeqSaver, *itSeqLoader);
+        ASSERT_EQ(*itDesSaver, *itDesLoader);
+    }
 }
 
 TEST(FastaFormatTest, LoadSaveWithoutDescription)
 {
     const std::string file("LoadSaveWithoutDescription.txt");
 
-	/******************Save****************************/
+    /******************Save****************************/
     const biopp::NucSequence sequenceSave1("ATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCG");
     const biopp::NucSequence sequenceSave2("ATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCG");
     const biopp::NucSequence sequenceSave3("ATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCG");
@@ -80,7 +80,7 @@ TEST(FastaFormatTest, LoadSaveWithoutDescription)
     fs.save_next_sequence(titleSave2, sequenceSave2);
     fs.save_next_sequence(sequenceSave3);//without description
 
-	/*******************Load**************************/
+    /*******************Load**************************/
     FastaParser<biopp::NucSequence> fp(file);
 
     biopp::NucSequence sequenceLoad1;
@@ -95,7 +95,7 @@ TEST(FastaFormatTest, LoadSaveWithoutDescription)
     fp.get_next_sequence(titleLoad2, sequenceLoad2);
     fp.get_next_sequence(titleLoad3, sequenceLoad3);
 
-	/*******************Compare************************/
+    /*******************Compare************************/
     ASSERT_EQ(sequenceSave1, sequenceLoad1);
     ASSERT_EQ(titleSave1, titleLoad1);
 
