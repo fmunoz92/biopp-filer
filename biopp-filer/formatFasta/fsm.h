@@ -83,17 +83,6 @@ private:
         const State* lineEmpty() const;
     };
 
-    class Error : public State
-    {
-    public:
-        Error(FastaMachine* fm)
-            : State(fm)
-        {}
-        const State* lineDescription(const DataType& line) const;
-        const State* lineSequence(const DataType& line) const;
-        const State* lineEmpty() const;
-    };
-
     class Exit : public State
     {
     public:
@@ -108,7 +97,6 @@ private:
     const State* const waitingForSequence;
     const State* const waitingForDescription;
     const State* const readingSequence;
-    const State* const error;
     const State* const exit;
     const State* current;
 
@@ -139,7 +127,6 @@ public:
         : waitingForSequence(new WaitingForSequence(this)),
           waitingForDescription(new WaitingForDescription(this)),
           readingSequence(new ReadingSequence(this)),
-          error(new Error(this)),
           exit(new Exit(this)),
           current(waitingForDescription),
           previousDescription(false),
@@ -153,7 +140,6 @@ public:
         delete waitingForSequence;
         delete waitingForDescription;
         delete readingSequence;
-        delete error;
         delete exit;
     }
 
@@ -164,7 +150,7 @@ public:
 
     bool isRunning() const
     {
-        return (current != exit) && (current != error);//is valid?
+        return (current != exit);//is valid?
     }
 
     void getSequence(Sequence& seq, DataType& des) const
@@ -217,7 +203,7 @@ template<class Sequence>
 inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForSequence::lineDescription(const DataType& line) const
 {
     throw FileError(string("Expected lineSequence, ") + line);
-    return this->fsm->error;
+    return NULL;
 }
 
 template<class Sequence>
@@ -231,7 +217,7 @@ template<class Sequence>
 inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForSequence::lineEmpty() const
 {
     throw FileError(string("Expected lineSequence"));
-    return this->fsm->error;
+    return NULL;
 }
 
 template<class Sequence>
@@ -281,32 +267,11 @@ inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Wai
 }
 
 template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Error::lineDescription(const DataType& line) const
-{
-    throw FileError(string("State Error ") + line);
-    return this;
-}
-
-template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Error::lineEmpty() const
-{
-    throw FileError(string("State Error, empty line"));
-    return this;
-}
-
-template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Error::lineSequence(const DataType& line) const
-{
-    throw FileError(string("State Error ") + line);
-    return this;
-}
-
-template<class Sequence>
 inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Exit::lineDescription(const DataType& line) const
 {
     throw FileError(string("Expected reset, " + line));
 
-    return this->fsm->error;
+    return NULL;
 }
 
 template<class Sequence>
@@ -314,7 +279,7 @@ inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Exi
 {
     throw FileError(string("Expected reset"));
 
-    return this->fsm->error;
+    return NULL;
 }
 
 template<class Sequence>
@@ -322,7 +287,7 @@ inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Exi
 {
     throw FileError(string("Expected reset, " + line));
 
-    return this->fsm->error;
+    return NULL;
 }
 
 }
