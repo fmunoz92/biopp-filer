@@ -35,7 +35,6 @@ template<class Sequence>
 class FastaParser
 {
 private:
-    const std::string file_name;
 
     static void removeComment(std::string& line)
     {
@@ -55,6 +54,7 @@ private:
 
     void stimulateFastaMachine();
 
+    const std::string file_name;
     std::ifstream is;
     FastaMachine<Sequence> fsm;
 public:

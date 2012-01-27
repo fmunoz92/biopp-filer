@@ -288,7 +288,10 @@ inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Exi
 template<class Sequence>
 inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Exit::lineEmpty() const
 {
-    return this;
+    this->fsm->description.clear();
+    this->fsm->sequence.clear();
+
+    return this->fsm->waitingForSequence;
 }
 
 template<class Sequence>
