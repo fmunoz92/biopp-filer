@@ -1,18 +1,24 @@
 digraph finite_state_machine {
-	rankdir=LR;
-	size="15"
-	node [shape = doublecircle]; WaitingForDescription;
-	node [shape = circle];
+    rankdir=LR;
+    size="15"
+    node [shape = doublecircle]; WaitingForDescription;
+    node [shape = circle];
 
     WaitingForDescription -> WaitingForDescription [ label = "lineEmpty" ];
-	WaitingForDescription -> WaitingForSequence [ label = "lineDescription/{description = line}" ];
-	WaitingForDescription -> ReadingSequence    [ label = "lineSequence/{seq = line}" ];
+    WaitingForDescription -> WaitingForSequence [ label = "lineDescription/{description = line}" ];
+    WaitingForDescription -> ReadingSequence    [ label = "lineSequence/{seq = line}" ];
+    WaitingForDescription -> Exit    [ label = "eof" ];
 
-	WaitingForSequence -> ReadingSequence    [ label = "lineSequence/{seq = line}" ];
-	WaitingForSequence -> Error              [ label = "lineDescription" ];
-	WaitingForSequence -> Error              [ label = "lineEmpty" ];
+    WaitingForSequence -> ReadingSequence    [ label = "lineSequence/{seq = line}" ];
+    WaitingForSequence -> Error              [ label = "lineDescription" ];
+    WaitingForSequence -> Error              [ label = "lineEmpty" ];
+    WaitingForSequence -> Error              [ label = "eof" ];
 
-	ReadingSequence    -> Exit               [ label = "lineEmpty" ];
-	ReadingSequence    -> ReadingSequence    [ label = "lineSequence/{seq += line}" ];
+    ReadingSequence    -> Exit               [ label = "lineEmpty" ];
+    ReadingSequence    -> ReadingSequence    [ label = "lineSequence/{seq += line}" ];
     ReadingSequence    -> Exit               [ label = "lineDescription/{saveDescriptionStimulus}" ];
+    ReadingSequence    -> Exit               [ label = "eof" ];
+
+    Exit               -> ReadingSequence    [ label = "lineDescription/{description = line}" ]
+    Exit               -> ReadingSequence    [ label = "lineSequence/{seq = line, description.clear()}" ]
 }

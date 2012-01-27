@@ -102,10 +102,9 @@ void FastaParser<Sequence>::stimulateFastaMachine()
 template<class Sequence>
 bool FastaParser<Sequence>::get_next_sequence(std::string& title, Sequence& seq)
 {
-    fsm.reset();
-
-    while (fsm.isRunning())
+    do
         stimulateFastaMachine();
+    while (fsm.isRunning());
 
     fsm.getSequence(seq, title);
 

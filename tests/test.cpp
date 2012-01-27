@@ -7,6 +7,7 @@
 
 using namespace bioppFiler;
 
+
 TEST(FastaFormatTest, LoadSave)
 {
     const std::string file("LoadSave.txt");
@@ -61,6 +62,7 @@ TEST(FastaFormatTest, LoadSave)
         ASSERT_EQ(*itDesSaver, *itDesLoader);
     }
 }
+
 
 TEST(FastaFormatTest, LoadSaveWithoutDescription)
 {
