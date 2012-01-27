@@ -53,6 +53,8 @@ private:
         line = mili::trim(line);
     }
 
+    void stimulateFastaMachine();
+
     std::ifstream is;
     FastaMachine<Sequence> fsm;
 public:
@@ -75,13 +77,10 @@ public:
 };
 
 template<class Sequence>
-bool FastaParser<Sequence>::get_next_sequence(std::string& title, Sequence& seq)
+void FastaParser<Sequence>::stimulateFastaMachine()
 {
-    std::string line;
-
-    fsm.reset();
-
-    while (fsm.isRunning() && std::getline(is, line))
+    static std::string line;
+    if (std::getline(is, line))
     {
         removeComment(line);
         removeWhiteSpace(line);
@@ -96,6 +95,17 @@ bool FastaParser<Sequence>::get_next_sequence(std::string& title, Sequence& seq)
         else
             fsm.lineSequence(line);
     }
+    else
+        fsm.eof();
+}
+
+template<class Sequence>
+bool FastaParser<Sequence>::get_next_sequence(std::string& title, Sequence& seq)
+{
+    fsm.reset();
+
+    while (fsm.isRunning())
+        stimulateFastaMachine();
 
     fsm.getSequence(seq, title);
 
