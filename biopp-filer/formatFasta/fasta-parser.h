@@ -54,14 +54,12 @@ private:
 
     void stimulateFastaMachine();
 
-    const std::string file_name;
     std::ifstream is;
     FastaMachine<Sequence> fsm;
 public:
 
     FastaParser(const std::string& file_name)
-        : file_name(file_name),
-          is(file_name.c_str()),
+        : is(file_name.c_str()),
           fsm()
     {
         if (!is.is_open())
@@ -102,11 +100,12 @@ void FastaParser<Sequence>::stimulateFastaMachine()
 template<class Sequence>
 bool FastaParser<Sequence>::get_next_sequence(std::string& title, Sequence& seq)
 {
-    do
+    while (fsm.isRunning())
         stimulateFastaMachine();
-    while (fsm.isRunning());
 
     fsm.getSequence(seq, title);
+
+    fsm.reset();
 
     return seq.length() != 0;
 }

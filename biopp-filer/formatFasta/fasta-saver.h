@@ -34,14 +34,12 @@ class FastaSaver
 {
 private:
 
-    const std::string file_name;
     std::ofstream os;
 
 public:
 
     FastaSaver(const std::string& file_name)
-        : file_name(file_name),
-          os(file_name.c_str())
+        : os(file_name.c_str())
     {
         if (!os.is_open()) //necesario?
             throw FileNotFound(file_name);
