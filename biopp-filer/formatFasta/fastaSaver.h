@@ -35,6 +35,10 @@ class FastaSaver
 private:
 
     std::ofstream os;
+    static const unsigned int lineLimit = 50;
+
+    void saveSequence(const Sequence& seq);
+    void saveDescription(const std::string& des);
 
 public:
 
@@ -50,19 +54,30 @@ public:
         os.close();
     }
 
-    void save_next_sequence(const std::string& title, const Sequence& seq);
-    void save_next_sequence(const Sequence& seq);
+    void saveNextSequence(const std::string& title, const Sequence& seq);
+    void saveNextSequence(const Sequence& seq);
 };
 
 
 template<class Sequence>
-void FastaSaver<Sequence>::save_next_sequence(const std::string& title, const Sequence& seq)
+void FastaSaver<Sequence>::saveNextSequence(const std::string& title, const Sequence& seq)
 {
-    static const size_t lineLimit(50);
-    const std::string sequence = seq.getString();
-    int currentCharNumber(0);
+    saveDescription(title);
+    saveSequence(seq);
+}
 
-    os << ">" << title << std::endl;
+template<class Sequence>
+void FastaSaver<Sequence>::saveNextSequence(const Sequence& seq)
+{
+    os << std::endl;
+    saveSequence(seq);
+}
+
+template<class Sequence>
+void FastaSaver<Sequence>::saveSequence(const Sequence& seq)
+{
+    const std::string sequence = seq.getString();
+    unsigned int currentCharNumber(0);
 
     for (size_t i = 0; i < sequence.size(); i++)
     {
@@ -79,26 +94,9 @@ void FastaSaver<Sequence>::save_next_sequence(const std::string& title, const Se
 }
 
 template<class Sequence>
-void FastaSaver<Sequence>::save_next_sequence(const Sequence& seq)
+void FastaSaver<Sequence>::saveDescription(const std::string& title)
 {
-    static const size_t lineLimit(50);
-    const std::string sequence = seq.getString();
-    int currentCharNumber(0);
-
-    os << std::endl;
-
-    for (size_t i = 0; i < sequence.size(); i++)
-    {
-        os << sequence[i];
-        if (++currentCharNumber == lineLimit)
-        {
-            os << std::endl;
-            currentCharNumber = 0;
-        }
-    }
-
-    if (currentCharNumber != lineLimit)
-        os << std::endl;
+    os << ">" << title << std::endl;
 }
 
 }

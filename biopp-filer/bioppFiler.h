@@ -12,7 +12,7 @@ DEFINE_SPECIFIC_EXCEPTION(FileNotFound, BioppFilerException);
 DEFINE_SPECIFIC_EXCEPTION(FileError, BioppFilerException);
 }
 
-#include "formatFasta/fasta-saver.h"
-#include "formatFasta/fasta-parser.h"
+#include "formatFasta/fastaSaver.h"
+#include "formatFasta/fastaParser.h"
 
 #endif

@@ -26,7 +26,7 @@ fasta-parser.h: load and save sequences(NucSequence, PseudonucSequence, and Amin
 #include <string>
 #include <fstream>
 #include <mili/mili.h>
-#include "fsm.h"
+#include "fastaMachine.h"
 
 namespace bioppFiler
 {
@@ -71,7 +71,7 @@ public:
         is.close();
     }
 
-    bool get_next_sequence(std::string& title, Sequence& seq);
+    bool getNextSequence(std::string& description, Sequence& sequence);
 };
 
 template<class Sequence>
@@ -98,16 +98,18 @@ void FastaParser<Sequence>::stimulateFastaMachine()
 }
 
 template<class Sequence>
-bool FastaParser<Sequence>::get_next_sequence(std::string& title, Sequence& seq)
+bool FastaParser<Sequence>::getNextSequence(std::string& description, Sequence& sequence)
 {
-    while (fsm.isRunning())
-        stimulateFastaMachine();
+    description.clear();
+    sequence.clear();
+    fsm.setCurrentSequence(&sequence, &description);
 
-    fsm.getSequence(seq, title);
+    while (fsm.keepRunning())
+        stimulateFastaMachine();
 
     fsm.reset();
 
-    return seq.length() != 0;
+    return sequence.length() != 0;
 }
 
 }

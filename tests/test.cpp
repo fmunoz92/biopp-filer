@@ -3,7 +3,7 @@
 #include <iostream>
 #include <gtest/gtest.h>
 #include <biopp/biopp.h>
-#include <biopp-filer/bioppFiler.h>
+#include "biopp-filer/bioppFiler.h"
 
 using namespace bioppFiler;
 
@@ -33,7 +33,7 @@ TEST(FastaFormatTest, LoadSave)
     std::list<std::string>::iterator itDes = lDesSaver.begin();
     for (; itSeq != lSeqSaver.end(); itSeq++, itDes++)
     {
-        fs.save_next_sequence(*itDes, *itSeq);
+        fs.saveNextSequence(*itDes, *itSeq);
     }
 
     /*******************Load**************************/
@@ -42,7 +42,7 @@ TEST(FastaFormatTest, LoadSave)
 
     biopp::NucSequence sequenceLoad;
     std::string titleLoad;
-    while (fp.get_next_sequence(titleLoad, sequenceLoad))
+    while (fp.getNextSequence(titleLoad, sequenceLoad))
     {
         lSeqLoader.push_back(sequenceLoad);
         lDesLoader.push_back(titleLoad);
@@ -55,7 +55,7 @@ TEST(FastaFormatTest, LoadSave)
     std::list<std::string>::iterator        itDesSaver  = lDesSaver.begin();
     std::list<std::string>::iterator        itDesLoader = lDesLoader.begin();
 
-    for (; itSeq != lSeqSaver.end(); itSeqSaver++, itDesSaver++, itSeqLoader++, itDesLoader++)
+    for (; itSeqSaver != lSeqSaver.end(); itSeqSaver++, itDesSaver++, itSeqLoader++, itDesLoader++)
     {
         ASSERT_EQ(*itSeqSaver, *itSeqLoader);
         ASSERT_EQ(*itDesSaver, *itDesLoader);
@@ -76,9 +76,9 @@ TEST(FastaFormatTest, LoadSaveWithoutDescription)
 
     FastaSaver<biopp::NucSequence>  fs(file);
 
-    fs.save_next_sequence(titleSave1, sequenceSave1);
-    fs.save_next_sequence(titleSave2, sequenceSave2);
-    fs.save_next_sequence(sequenceSave3);//without description
+    fs.saveNextSequence(titleSave1, sequenceSave1);
+    fs.saveNextSequence(titleSave2, sequenceSave2);
+    fs.saveNextSequence(sequenceSave3);//without description
 
     /*******************Load**************************/
     FastaParser<biopp::NucSequence> fp(file);
@@ -91,9 +91,9 @@ TEST(FastaFormatTest, LoadSaveWithoutDescription)
     std::string titleLoad2;
     std::string titleLoad3;
 
-    fp.get_next_sequence(titleLoad1, sequenceLoad1);
-    fp.get_next_sequence(titleLoad2, sequenceLoad2);
-    fp.get_next_sequence(titleLoad3, sequenceLoad3);
+    fp.getNextSequence(titleLoad1, sequenceLoad1);
+    fp.getNextSequence(titleLoad2, sequenceLoad2);
+    fp.getNextSequence(titleLoad3, sequenceLoad3);
 
     /*******************Compare************************/
     ASSERT_EQ(sequenceSave1, sequenceLoad1);
@@ -139,9 +139,9 @@ TEST(FastaFormatTest, Load)
 
     FastaParser<biopp::NucSequence> fp(file);
 
-    fp.get_next_sequence(title1, seq1);
-    fp.get_next_sequence(title2, seq2);
-    fp.get_next_sequence(title3, seq3);
+    fp.getNextSequence(title1, seq1);
+    fp.getNextSequence(title2, seq2);
+    fp.getNextSequence(title3, seq3);
 
     ASSERT_EQ("ATCGAATCGATCGTCG", seq1.getString());
     ASSERT_EQ("SEQUENCE_1", title1);
