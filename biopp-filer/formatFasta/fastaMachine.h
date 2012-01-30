@@ -100,9 +100,9 @@ private:
 
     void yield()
     {
-        *current_description = description;
-        *current_sequence    = sequence;
-        running              = false;
+        *currentDescription = description;
+        *currentSequence    = sequence;
+        running             = false;
     }
 
     const State* const waitingForDescription;
@@ -111,14 +111,13 @@ private:
     const State* const endOfFile;
     const State*       current;
 
-    Sequence* current_sequence;
-    LineType* current_description;
+    Sequence* currentSequence;
+    LineType* currentDescription;
 
     Sequence sequence;
     LineType description;
 
     bool running;
-
 public:
 
     FastaMachine()
@@ -127,8 +126,8 @@ public:
           readingSequence(new ReadingSequence(this)),
           endOfFile(new EndOfFile(this)),
           current(waitingForDescription),
-          current_sequence(NULL),
-          current_description(NULL),
+          currentSequence(NULL),
+          currentDescription(NULL),
           sequence(),
           description(),
           running(true)
@@ -142,10 +141,10 @@ public:
         delete endOfFile;
     }
 
-    void setCurrentSequence(Sequence* seq, LineType* des)
+    void setCurrentSequence(Sequence& seq, LineType& des)
     {
-        current_sequence    = seq;
-        current_description = des;
+        currentSequence    = &seq;
+        currentDescription = &des;
     }
 
     bool keepRunning() const
