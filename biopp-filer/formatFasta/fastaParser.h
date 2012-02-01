@@ -1,5 +1,5 @@
 /*
-fasta-parser.h: load and save sequences(NucSequence, PseudonucSequence, and AminoSequence)
+fastaParser.h: load and save sequences(NucSequence, PseudonucSequence, and AminoSequence)
     Copyright (C) 2012 Facundo Muñoz FuDePAN
 
     This file is part of Biopp-filer.
@@ -38,8 +38,9 @@ private:
 
     static void removeComment(std::string& line)
     {
-        const size_t comentPosistion = line.find_first_of(";");
-        line = line.substr(0, comentPosistion);
+        const std::string::size_type commentPosistion = line.find_first_of(";");
+        if (commentPosistion != std::string::npos)
+            line = line.substr(0, commentPosistion);
     }
 
     static void removeFirstChar(std::string& line)
@@ -55,41 +56,39 @@ private:
     void stimulateFastaMachine();
 
     std::ifstream is;
-    FastaMachine<Sequence> fsm;
+    FastaMachine fsm;
 public:
 
     FastaParser(const std::string& file_name)
-        : is(file_name.c_str()),
-          fsm()
+        : is(file_name.c_str())
     {
         if (!is.is_open())
             throw FileNotFound(file_name);
     }
 
-    ~FastaParser()
-    {
-        is.close();
-    }
-
     bool getNextSequence(std::string& description, Sequence& sequence);
+    bool getNextSequence(std::string& description, std::string& sequence);
 };
 
 template<class Sequence>
 void FastaParser<Sequence>::stimulateFastaMachine()
 {
-    static std::string line;
+    std::string line;
+
     if (std::getline(is, line))
     {
         removeComment(line);
         removeWhiteSpace(line);
 
-        if (line[0] == '>')
+        if (line.empty())
+        {
+            fsm.lineEmpty(line);
+        }
+        else if (line[0] == '>')
         {
             removeFirstChar(line);
             fsm.lineDescription(line);
         }
-        else if (line.size() == 0)
-            fsm.lineEmpty(line);
         else
             fsm.lineSequence(line);
     }
@@ -100,6 +99,17 @@ void FastaParser<Sequence>::stimulateFastaMachine()
 template<class Sequence>
 bool FastaParser<Sequence>::getNextSequence(std::string& description, Sequence& sequence)
 {
+    std::string sequenceString;
+    bool result = getNextSequence(description, sequenceString);
+
+    sequence = sequenceString;
+
+    return result;
+}
+
+template<class Sequence>
+bool FastaParser<Sequence>::getNextSequence(std::string& description, std::string& sequence)
+{
     description.clear();
     sequence.clear();
     fsm.setCurrentSequence(sequence, description);
@@ -109,7 +119,7 @@ bool FastaParser<Sequence>::getNextSequence(std::string& description, Sequence& 
 
     fsm.reset();
 
-    return sequence.length() != 0;
+    return fsm.isValidSequence();
 }
 
 }

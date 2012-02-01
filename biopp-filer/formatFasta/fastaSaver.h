@@ -1,5 +1,5 @@
 /*
-fasta-saver.h: load and save sequences(NucSequence, PseudonucSequence, and AminoSequence)
+fastaSaver.h: load and save sequences(NucSequence, PseudonucSequence, and AminoSequence)
     Copyright (C) 2012 Facundo Muñoz FuDePAN
 
     This file is part of Biopp-filer.
@@ -47,11 +47,6 @@ public:
     {
         if (!os.is_open()) //necesario?
             throw FileNotFound(file_name);
-    }
-
-    ~FastaSaver()
-    {
-        os.close();
     }
 
     void saveNextSequence(const std::string& title, const Sequence& seq);

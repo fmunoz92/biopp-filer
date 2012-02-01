@@ -4,10 +4,10 @@ digraph finite_state_machine {
 	node [shape = doublecircle]; WaitingForDescription;
 	node [shape = circle];
 
-    WaitingForDescription -> WaitingForDescription      [ label = "lineEmpty" ];
+    WaitingForDescription -> WaitingForDescription [ label = "lineEmpty" ];
 	WaitingForDescription -> WaitingForSequence    [ label = "lineDescription/{description = line;}" ];
 	WaitingForDescription -> ReadingSequence       [ label = "lineSequence/{sequence = line;}" ];
-	WaitingForDescription -> EndOfFile             [ label = "eof{yield(sequence, description);}" ];
+	WaitingForDescription -> EndOfFile             [ label = "eof{yield('', '');}" ];
 
 	WaitingForSequence    -> ReadingSequence       [ label = "lineSequence/{sequence = line;}" ];
 	WaitingForSequence    -> Error                 [ label = "lineDescription" ];

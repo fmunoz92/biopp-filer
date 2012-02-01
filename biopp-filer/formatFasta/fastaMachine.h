@@ -1,5 +1,5 @@
 /*
-fsm.h: load and save sequences(NucSequence, PseudonucSequence, and AminoSequence)
+fastaMachine.h: load and save sequences(NucSequence, PseudonucSequence, and AminoSequence)
     Copyright (C) 2012 Facundo Muñoz FuDePAN
 
     This file is part of Biopp-filer.
@@ -29,8 +29,8 @@ namespace bioppFiler
 {
 
 typedef std::string LineType;
+typedef std::string Sequence;
 
-template<class Sequence>
 class FastaMachine
 {
 private:
@@ -118,6 +118,7 @@ private:
     LineType description;
 
     bool running;
+
 public:
 
     FastaMachine()
@@ -126,10 +127,6 @@ public:
           readingSequence(new ReadingSequence(this)),
           endOfFile(new EndOfFile(this)),
           current(waitingForDescription),
-          currentSequence(NULL),
-          currentDescription(NULL),
-          sequence(),
-          description(),
           running(true)
     {}
 
@@ -145,6 +142,11 @@ public:
     {
         currentSequence    = &seq;
         currentDescription = &des;
+    }
+
+    bool isValidSequence()
+    {
+        return !currentSequence->empty();
     }
 
     bool keepRunning() const
@@ -167,88 +169,75 @@ public:
     void eof();
 };
 
-template<class Sequence>
-void FastaMachine<Sequence>::lineDescription(const LineType& line)
+void FastaMachine::lineDescription(const LineType& line)
 {
     current = current->lineDescription(line);
 }
 
-template<class Sequence>
-void FastaMachine<Sequence>::lineSequence(const LineType& line)
+void FastaMachine::lineSequence(const LineType& line)
 {
     current = current->lineSequence(line);
 }
 
-template<class Sequence>
-void FastaMachine<Sequence>::lineEmpty(const LineType&)
+void FastaMachine::lineEmpty(const LineType&)
 {
     current = current->lineEmpty();
 }
 
-template<class Sequence>
-void FastaMachine<Sequence>::eof()
+void FastaMachine::eof()
 {
     current = current->eof();
 }
 
-template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForDescription::lineDescription(const LineType& line) const
+inline const FastaMachine::State* FastaMachine::WaitingForDescription::lineDescription(const LineType& line) const
 {
     this->fsm->description = line;
 
     return this->fsm->waitingForSequence;
 }
 
-template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForDescription::lineEmpty() const
+inline const FastaMachine::State* FastaMachine::WaitingForDescription::lineEmpty() const
 {
     return this;
 }
 
-template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForDescription::lineSequence(const LineType& line) const
+inline const FastaMachine::State* FastaMachine::WaitingForDescription::lineSequence(const LineType& line) const
 {
     this->fsm->sequence = line;
 
     return this->fsm->readingSequence;
 }
 
-template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForDescription::eof() const
+inline const FastaMachine::State* FastaMachine::WaitingForDescription::eof() const
 {
     this->fsm->yield();
 
     return this->fsm->endOfFile;
 }
 
-template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForSequence::lineDescription(const LineType&) const
+inline const FastaMachine::State* FastaMachine::WaitingForSequence::lineDescription(const LineType&) const
 {
     throw FileError(string("WaitingForSequence, Expected lineSequence"));
 }
 
-template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForSequence::lineSequence(const LineType& line) const
+inline const FastaMachine::State* FastaMachine::WaitingForSequence::lineSequence(const LineType& line) const
 {
     this->fsm->sequence = line;
 
     return this->fsm->readingSequence;
 }
 
-template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForSequence::lineEmpty() const
+inline const FastaMachine::State* FastaMachine::WaitingForSequence::lineEmpty() const
 {
     throw FileError(string("WaitingForSequence, Expected lineSequence"));
 }
 
-template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::WaitingForSequence::eof() const
+inline const FastaMachine::State* FastaMachine::WaitingForSequence::eof() const
 {
     throw FileError(string("WaitingForSequence, Expected lineSequence"));
 }
 
-template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::ReadingSequence::lineDescription(const LineType& line) const
+inline const FastaMachine::State* FastaMachine::ReadingSequence::lineDescription(const LineType& line) const
 {
     this->fsm->yield();
     this->fsm->description = line;
@@ -256,8 +245,7 @@ inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Rea
     return this->fsm->waitingForSequence;
 }
 
-template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::ReadingSequence::lineEmpty() const
+inline const FastaMachine::State* FastaMachine::ReadingSequence::lineEmpty() const
 {
     this->fsm->yield();
     this->fsm->description.clear();
@@ -266,44 +254,36 @@ inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::Rea
     return this->fsm->waitingForDescription;
 }
 
-template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::ReadingSequence::lineSequence(const LineType& line) const
+inline const FastaMachine::State* FastaMachine::ReadingSequence::lineSequence(const LineType& line) const
 {
-    LineType tmp = this->fsm->sequence.getString();
-    tmp += line;
-    this->fsm->sequence = tmp;
+    this->fsm->sequence += line;
 
     return this;
 }
 
-template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::ReadingSequence::eof() const
+inline const FastaMachine::State* FastaMachine::ReadingSequence::eof() const
 {
     this->fsm->yield();
 
     return this->fsm->endOfFile;
 }
 
-template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::EndOfFile::lineDescription(const LineType&) const
+inline const FastaMachine::State* FastaMachine::EndOfFile::lineDescription(const LineType&) const
 {
     return this;
 }
 
-template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::EndOfFile::lineEmpty() const
+inline const FastaMachine::State* FastaMachine::EndOfFile::lineEmpty() const
 {
     return this;
 }
 
-template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::EndOfFile::lineSequence(const LineType&) const
+inline const FastaMachine::State* FastaMachine::EndOfFile::lineSequence(const LineType&) const
 {
     return this;
 }
 
-template<class Sequence>
-inline const typename FastaMachine<Sequence>::State* FastaMachine<Sequence>::EndOfFile::eof() const
+inline const FastaMachine::State* FastaMachine::EndOfFile::eof() const
 {
     return this;
 }
