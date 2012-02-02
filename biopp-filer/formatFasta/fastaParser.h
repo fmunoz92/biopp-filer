@@ -114,10 +114,9 @@ bool FastaParser<Sequence>::getNextSequence(std::string& description, std::strin
     sequence.clear();
     fsm.setCurrentSequence(sequence, description);
 
-    while (fsm.keepRunning())
+    do
         stimulateFastaMachine();
-
-    fsm.reset();
+    while (fsm.keepRunning());
 
     return fsm.isValidSequence();
 }

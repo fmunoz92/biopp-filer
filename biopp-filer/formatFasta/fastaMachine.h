@@ -154,14 +154,6 @@ public:
         return running && (current != endOfFile);
     }
 
-    /*
-     * reset flags for keepRunning(Sequence*, LineType*)
-     */
-    void reset()
-    {
-        running = true;
-    }
-
     /***************Stimulus**************/
     void lineDescription(const LineType& line);
     void lineSequence(const LineType& line);
@@ -171,21 +163,25 @@ public:
 
 void FastaMachine::lineDescription(const LineType& line)
 {
+    running =  true;
     current = current->lineDescription(line);
 }
 
 void FastaMachine::lineSequence(const LineType& line)
 {
+    running =  true;
     current = current->lineSequence(line);
 }
 
 void FastaMachine::lineEmpty(const LineType&)
 {
+    running =  true;
     current = current->lineEmpty();
 }
 
 void FastaMachine::eof()
 {
+    running =  true;
     current = current->eof();
 }
 
