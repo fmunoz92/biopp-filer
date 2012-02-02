@@ -31,7 +31,7 @@ fastaParser.h: load and save sequences(NucSequence, PseudonucSequence, and Amino
 namespace bioppFiler
 {
 
-template<class Sequence>
+template<class SequenceType>
 class FastaParser
 {
 private:
@@ -66,12 +66,12 @@ public:
             throw FileNotFound(file_name);
     }
 
-    bool getNextSequence(std::string& description, Sequence& sequence);
+    bool getNextSequence(std::string& description, SequenceType& sequence);
     bool getNextSequence(std::string& description, std::string& sequence);
 };
 
-template<class Sequence>
-void FastaParser<Sequence>::stimulateFastaMachine()
+template<class SequenceType>
+void FastaParser<SequenceType>::stimulateFastaMachine()
 {
     std::string line;
 
@@ -96,19 +96,19 @@ void FastaParser<Sequence>::stimulateFastaMachine()
         fsm.eof();
 }
 
-template<class Sequence>
-bool FastaParser<Sequence>::getNextSequence(std::string& description, Sequence& sequence)
+template<class SequenceType>
+bool FastaParser<SequenceType>::getNextSequence(std::string& description, SequenceType& sequence)
 {
-    std::string sequenceString;
-    bool result = getNextSequence(description, sequenceString);
+    std::string sequenceString;//for type conversion
+    const bool result = getNextSequence(description, sequenceString);
 
     sequence = sequenceString;
 
     return result;
 }
 
-template<class Sequence>
-bool FastaParser<Sequence>::getNextSequence(std::string& description, std::string& sequence)
+template<class SequenceType>
+bool FastaParser<SequenceType>::getNextSequence(std::string& description, std::string& sequence)
 {
     description.clear();
     sequence.clear();

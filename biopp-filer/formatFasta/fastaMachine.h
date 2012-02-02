@@ -105,6 +105,13 @@ private:
         running             = false;
     }
 
+    /*
+    * reset flags for keepRunning(Sequence*, LineType*)
+    */
+    void resetFlags()
+    {
+        running = true;
+    }
     const State* const waitingForDescription;
     const State* const waitingForSequence;
     const State* const readingSequence;
@@ -163,25 +170,25 @@ public:
 
 void FastaMachine::lineDescription(const LineType& line)
 {
-    running =  true;
+    resetFlags();
     current = current->lineDescription(line);
 }
 
 void FastaMachine::lineSequence(const LineType& line)
 {
-    running =  true;
+    resetFlags();
     current = current->lineSequence(line);
 }
 
 void FastaMachine::lineEmpty(const LineType&)
 {
-    running =  true;
+    resetFlags();
     current = current->lineEmpty();
 }
 
 void FastaMachine::eof()
 {
-    running =  true;
+    resetFlags();
     current = current->eof();
 }
 
