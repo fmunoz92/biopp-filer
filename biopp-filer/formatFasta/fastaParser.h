@@ -34,29 +34,6 @@ namespace bioppFiler
 template<class SequenceType>
 class FastaParser
 {
-private:
-
-    static void removeComment(std::string& line)
-    {
-        const std::string::size_type commentPosistion = line.find_first_of(";");
-        if (commentPosistion != std::string::npos)
-            line = line.substr(0, commentPosistion);
-    }
-
-    static void removeFirstChar(std::string& line)
-    {
-        line = line.substr(1, line.size());
-    }
-
-    static void removeWhiteSpace(std::string& line)
-    {
-        line = mili::trim(line);
-    }
-
-    void stimulateFastaMachine();
-
-    std::ifstream is;
-    FastaMachine fsm;
 public:
 
     FastaParser(const std::string& file_name)
@@ -67,59 +44,22 @@ public:
     }
 
     bool getNextSequence(std::string& description, SequenceType& sequence);
+
+private:
+
+    void removeComment(std::string& line);
+    void removeFirstChar(std::string& line);
+    void removeWhiteSpace(std::string& line);
+
+    void stimulateFastaMachine();
     bool getNextSequence(std::string& description, std::string& sequence);
+
+    std::ifstream is;
+    FastaMachine fsm;
 };
-
-template<class SequenceType>
-void FastaParser<SequenceType>::stimulateFastaMachine()
-{
-    std::string line;
-
-    if (std::getline(is, line))
-    {
-        removeComment(line);
-        removeWhiteSpace(line);
-
-        if (line.empty())
-        {
-            fsm.lineEmpty(line);
-        }
-        else if (line[0] == '>')
-        {
-            removeFirstChar(line);
-            fsm.lineDescription(line);
-        }
-        else
-            fsm.lineSequence(line);
-    }
-    else
-        fsm.eof();
 }
 
-template<class SequenceType>
-bool FastaParser<SequenceType>::getNextSequence(std::string& description, SequenceType& sequence)
-{
-    std::string sequenceString;//for type conversion
-    const bool result = getNextSequence(description, sequenceString);
-
-    sequence = sequenceString;
-
-    return result;
-}
-
-template<class SequenceType>
-bool FastaParser<SequenceType>::getNextSequence(std::string& description, std::string& sequence)
-{
-    description.clear();
-    sequence.clear();
-    fsm.setCurrentSequence(sequence, description);
-
-    do
-        stimulateFastaMachine();
-    while (fsm.keepRunning());
-
-    return fsm.isValidSequence();
-}
-
-}
+#define FASTA_PARSER_INLINE_H
+#include "fastaParser_inline.h"
+#undef FASTA_PARSER_INLINE_H
 #endif

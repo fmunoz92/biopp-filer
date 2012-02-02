@@ -28,13 +28,43 @@ fastaMachine.h: load and save sequences(NucSequence, PseudonucSequence, and Amin
 namespace bioppFiler
 {
 
-typedef std::string LineType;
-typedef std::string Sequence;
-
 class FastaMachine
 {
+public:
+
+    typedef std::string LineType;
+    typedef std::string Sequence;
+
+    FastaMachine()
+        : waitingForDescription(new WaitingForDescription(this)),
+          waitingForSequence(new WaitingForSequence(this)),
+          readingSequence(new ReadingSequence(this)),
+          endOfFile(new EndOfFile(this)),
+          current(waitingForDescription),
+          running(true)
+    {}
+
+    ~FastaMachine()
+    {
+        delete waitingForSequence;
+        delete waitingForDescription;
+        delete readingSequence;
+        delete endOfFile;
+    }
+
+    void setCurrentSequence(Sequence& seq, LineType& des);
+    bool isValidSequence() const;
+    bool keepRunning() const;
+
+    /***************Stimulus**************/
+    void lineDescription(const LineType& line);
+    void lineSequence(const LineType& line);
+    void lineEmpty(const LineType& line);
+    void eof();
+
 private:
-    class State
+
+    class State //abstract interface
     {
     protected:
         FastaMachine* const fsm;
@@ -98,20 +128,16 @@ private:
         const State* eof() const;
     };
 
-    void yield()
-    {
-        *currentDescription = description;
-        *currentSequence    = sequence;
-        running             = false;
-    }
+    /*
+     * return sequence and description to currents
+     */
+    void yield();
 
     /*
-    * reset flags for keepRunning(Sequence*, LineType*)
-    */
-    void resetFlags()
-    {
-        running = true;
-    }
+     * reset flags for keepRunning(Sequence*, LineType*)
+     */
+    void resetFlags();
+
     const State* const waitingForDescription;
     const State* const waitingForSequence;
     const State* const readingSequence;
@@ -125,171 +151,10 @@ private:
     LineType description;
 
     bool running;
-
-public:
-
-    FastaMachine()
-        : waitingForDescription(new WaitingForDescription(this)),
-          waitingForSequence(new WaitingForSequence(this)),
-          readingSequence(new ReadingSequence(this)),
-          endOfFile(new EndOfFile(this)),
-          current(waitingForDescription),
-          running(true)
-    {}
-
-    ~FastaMachine()
-    {
-        delete waitingForSequence;
-        delete waitingForDescription;
-        delete readingSequence;
-        delete endOfFile;
-    }
-
-    void setCurrentSequence(Sequence& seq, LineType& des)
-    {
-        currentSequence    = &seq;
-        currentDescription = &des;
-    }
-
-    bool isValidSequence()
-    {
-        return !currentSequence->empty();
-    }
-
-    bool keepRunning() const
-    {
-        return running && (current != endOfFile);
-    }
-
-    /***************Stimulus**************/
-    void lineDescription(const LineType& line);
-    void lineSequence(const LineType& line);
-    void lineEmpty(const LineType& line);
-    void eof();
 };
-
-void FastaMachine::lineDescription(const LineType& line)
-{
-    resetFlags();
-    current = current->lineDescription(line);
 }
 
-void FastaMachine::lineSequence(const LineType& line)
-{
-    resetFlags();
-    current = current->lineSequence(line);
-}
-
-void FastaMachine::lineEmpty(const LineType&)
-{
-    resetFlags();
-    current = current->lineEmpty();
-}
-
-void FastaMachine::eof()
-{
-    resetFlags();
-    current = current->eof();
-}
-
-inline const FastaMachine::State* FastaMachine::WaitingForDescription::lineDescription(const LineType& line) const
-{
-    this->fsm->description = line;
-
-    return this->fsm->waitingForSequence;
-}
-
-inline const FastaMachine::State* FastaMachine::WaitingForDescription::lineEmpty() const
-{
-    return this;
-}
-
-inline const FastaMachine::State* FastaMachine::WaitingForDescription::lineSequence(const LineType& line) const
-{
-    this->fsm->sequence = line;
-
-    return this->fsm->readingSequence;
-}
-
-inline const FastaMachine::State* FastaMachine::WaitingForDescription::eof() const
-{
-    this->fsm->yield();
-
-    return this->fsm->endOfFile;
-}
-
-inline const FastaMachine::State* FastaMachine::WaitingForSequence::lineDescription(const LineType&) const
-{
-    throw FileError(string("WaitingForSequence, Expected lineSequence"));
-}
-
-inline const FastaMachine::State* FastaMachine::WaitingForSequence::lineSequence(const LineType& line) const
-{
-    this->fsm->sequence = line;
-
-    return this->fsm->readingSequence;
-}
-
-inline const FastaMachine::State* FastaMachine::WaitingForSequence::lineEmpty() const
-{
-    throw FileError(string("WaitingForSequence, Expected lineSequence"));
-}
-
-inline const FastaMachine::State* FastaMachine::WaitingForSequence::eof() const
-{
-    throw FileError(string("WaitingForSequence, Expected lineSequence"));
-}
-
-inline const FastaMachine::State* FastaMachine::ReadingSequence::lineDescription(const LineType& line) const
-{
-    this->fsm->yield();
-    this->fsm->description = line;
-
-    return this->fsm->waitingForSequence;
-}
-
-inline const FastaMachine::State* FastaMachine::ReadingSequence::lineEmpty() const
-{
-    this->fsm->yield();
-    this->fsm->description.clear();
-    this->fsm->sequence.clear();
-
-    return this->fsm->waitingForDescription;
-}
-
-inline const FastaMachine::State* FastaMachine::ReadingSequence::lineSequence(const LineType& line) const
-{
-    this->fsm->sequence += line;
-
-    return this;
-}
-
-inline const FastaMachine::State* FastaMachine::ReadingSequence::eof() const
-{
-    this->fsm->yield();
-
-    return this->fsm->endOfFile;
-}
-
-inline const FastaMachine::State* FastaMachine::EndOfFile::lineDescription(const LineType&) const
-{
-    return this;
-}
-
-inline const FastaMachine::State* FastaMachine::EndOfFile::lineEmpty() const
-{
-    return this;
-}
-
-inline const FastaMachine::State* FastaMachine::EndOfFile::lineSequence(const LineType&) const
-{
-    return this;
-}
-
-inline const FastaMachine::State* FastaMachine::EndOfFile::eof() const
-{
-    return this;
-}
-
-}
+#define FASTA_MACHINE_INLINE_H
+#include "fastaMachine_inline.h"
+#undef FASTA_MACHINE_INLINE_H
 #endif

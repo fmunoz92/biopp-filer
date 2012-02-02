@@ -32,6 +32,25 @@ namespace bioppFiler
 template<class Sequence>
 class FastaSaver
 {
+public:
+
+    FastaSaver(const std::string& file_name)
+        : os(file_name.c_str())
+    {
+        if (!os.is_open())
+            throw FileNotFound(file_name);
+    }
+
+    FastaSaver(const std::ofstream& o)
+        : os(o)
+    {
+        if (!os.is_open())
+            throw FileNotFound();
+    }
+
+    void saveNextSequence(const std::string& title, const Sequence& seq);
+    void saveNextSequence(const Sequence& seq);
+
 private:
 
     std::ofstream os;
@@ -40,59 +59,10 @@ private:
     void saveSequence(const Sequence& seq);
     void saveDescription(const std::string& des);
 
-public:
-
-    FastaSaver(const std::string& file_name)
-        : os(file_name.c_str())
-    {
-        if (!os.is_open()) //necesario?
-            throw FileNotFound(file_name);
-    }
-
-    void saveNextSequence(const std::string& title, const Sequence& seq);
-    void saveNextSequence(const Sequence& seq);
 };
-
-
-template<class Sequence>
-void FastaSaver<Sequence>::saveNextSequence(const std::string& title, const Sequence& seq)
-{
-    saveDescription(title);
-    saveSequence(seq);
 }
 
-template<class Sequence>
-void FastaSaver<Sequence>::saveNextSequence(const Sequence& seq)
-{
-    os << std::endl;
-    saveSequence(seq);
-}
-
-template<class Sequence>
-void FastaSaver<Sequence>::saveSequence(const Sequence& seq)
-{
-    const std::string sequence = seq.getString();
-    unsigned int currentCharNumber(0);
-
-    for (size_t i = 0; i < sequence.size(); i++)
-    {
-        os << sequence[i];
-        if (++currentCharNumber == lineLimit)
-        {
-            os << std::endl;
-            currentCharNumber = 0;
-        }
-    }
-
-    if (currentCharNumber != lineLimit)
-        os << std::endl;
-}
-
-template<class Sequence>
-void FastaSaver<Sequence>::saveDescription(const std::string& title)
-{
-    os << ">" << title << std::endl;
-}
-
-}
+#define FASTA_SAVER_INLINE_H
+#include "fastaSaver_inline.h"
+#undef FASTA_SAVER_INLINE_H
 #endif
