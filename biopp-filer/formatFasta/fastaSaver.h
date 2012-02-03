@@ -29,35 +29,23 @@ fastaSaver.h: load and save sequences(NucSequence, PseudonucSequence, and AminoS
 namespace bioppFiler
 {
 
-template<class Sequence>
+template<class SequenceType>
 class FastaSaver
 {
 public:
 
-    FastaSaver(const std::string& file_name)
-        : os(file_name.c_str())
-    {
-        if (!os.is_open())
-            throw FileNotFound(file_name);
-    }
+    inline FastaSaver(const std::string& file_name);
 
-    FastaSaver(const std::ofstream& o)
-        : os(o)
-    {
-        if (!os.is_open())
-            throw FileNotFound();
-    }
-
-    void saveNextSequence(const std::string& title, const Sequence& seq);
-    void saveNextSequence(const Sequence& seq);
+    inline void saveNextSequence(const std::string& title, const SequenceType& seq);
+    inline void saveNextSequence(const SequenceType& seq);
 
 private:
 
     std::ofstream os;
     static const unsigned int lineLimit = 50;
 
-    void saveSequence(const Sequence& seq);
-    void saveDescription(const std::string& des);
+    inline void saveSequence(const SequenceType& seq);
+    inline void saveDescription(const std::string& des);
 
 };
 }

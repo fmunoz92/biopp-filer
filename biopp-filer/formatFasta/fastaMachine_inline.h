@@ -49,10 +49,10 @@ public:
     WaitingForDescription(FastaMachine* fm)
         : State(fm)
     {}
-    const State* lineDescription(const LineType& line) const;
-    const State* lineSequence(const LineType& line) const;
-    const State* lineEmpty() const;
-    const State* eof() const;
+    inline const State* lineDescription(const LineType& line) const;
+    inline const State* lineSequence(const LineType& line) const;
+    inline const State* lineEmpty() const;
+    inline const State* eof() const;
 };
 
 class FastaMachine::WaitingForSequence : public State
@@ -61,10 +61,10 @@ public:
     WaitingForSequence(FastaMachine* fm)
         : State(fm)
     {}
-    const State* lineDescription(const LineType& line) const;
-    const State* lineSequence(const LineType& line) const;
-    const State* lineEmpty() const;
-    const State* eof() const;
+    inline const State* lineDescription(const LineType& line) const;
+    inline const State* lineSequence(const LineType& line) const;
+    inline const State* lineEmpty() const;
+    inline const State* eof() const;
 };
 
 class FastaMachine::ReadingSequence : public State
@@ -73,10 +73,10 @@ public:
     ReadingSequence(FastaMachine* fm)
         : State(fm)
     {}
-    const State* lineDescription(const LineType& line) const;
-    const State* lineSequence(const LineType& line) const;
-    const State* lineEmpty() const;
-    const State* eof() const;
+    inline const State* lineDescription(const LineType& line) const;
+    inline const State* lineSequence(const LineType& line) const;
+    inline const State* lineEmpty() const;
+    inline const State* eof() const;
 };
 
 class FastaMachine::EndOfFile : public State
@@ -85,13 +85,13 @@ public:
     EndOfFile(FastaMachine* fm)
         : State(fm)
     {}
-    const State* lineDescription(const LineType& line) const;
-    const State* lineSequence(const LineType& line) const;
-    const State* lineEmpty() const;
-    const State* eof() const;
+    inline const State* lineDescription(const LineType& line) const;
+    inline const State* lineSequence(const LineType& line) const;
+    inline const State* lineEmpty() const;
+    inline const State* eof() const;
 };
 
-FastaMachine::FastaMachine()
+inline FastaMachine::FastaMachine()
     : waitingForDescription(new WaitingForDescription(this)),
       waitingForSequence(new WaitingForSequence(this)),
       readingSequence(new ReadingSequence(this)),
@@ -100,7 +100,7 @@ FastaMachine::FastaMachine()
       running(true)
 {}
 
-FastaMachine::~FastaMachine()
+inline FastaMachine::~FastaMachine()
 {
     delete waitingForSequence;
     delete waitingForDescription;

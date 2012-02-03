@@ -27,22 +27,30 @@ fastaSaver_inline.h: load and save sequences(NucSequence, PseudonucSequence, and
 namespace bioppFiler
 {
 
-template<class Sequence>
-void FastaSaver<Sequence>::saveNextSequence(const std::string& title, const Sequence& seq)
+template<class SequenceType>
+inline FastaSaver<SequenceType>::FastaSaver(const std::string& file_name)
+    : os(file_name.c_str())
+{
+    if (!os.is_open())
+        throw FileNotFound(file_name);
+}
+
+template<class SequenceType>
+inline void FastaSaver<SequenceType>::saveNextSequence(const std::string& title, const SequenceType& seq)
 {
     saveDescription(title);
     saveSequence(seq);
 }
 
-template<class Sequence>
-void FastaSaver<Sequence>::saveNextSequence(const Sequence& seq)
+template<class SequenceType>
+inline void FastaSaver<SequenceType>::saveNextSequence(const SequenceType& seq)
 {
     os << std::endl;
     saveSequence(seq);
 }
 
-template<class Sequence>
-void FastaSaver<Sequence>::saveSequence(const Sequence& seq)
+template<class SequenceType>
+inline void FastaSaver<SequenceType>::saveSequence(const SequenceType& seq)
 {
     const std::string sequence = seq.getString();
     unsigned int currentCharNumber(0);
@@ -61,8 +69,8 @@ void FastaSaver<Sequence>::saveSequence(const Sequence& seq)
         os << std::endl;
 }
 
-template<class Sequence>
-void FastaSaver<Sequence>::saveDescription(const std::string& title)
+template<class SequenceType>
+inline void FastaSaver<SequenceType>::saveDescription(const std::string& title)
 {
     os << ">" << title << std::endl;
 }

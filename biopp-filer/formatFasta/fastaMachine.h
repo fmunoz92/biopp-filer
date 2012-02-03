@@ -35,18 +35,18 @@ public:
     typedef std::string LineType;
     typedef std::string Sequence;
 
-    FastaMachine();
-    ~FastaMachine();
+    inline FastaMachine();
+    inline ~FastaMachine();
 
     inline void setCurrentSequence(Sequence& seq, LineType& des);
     inline bool isValidSequence() const;
     inline bool keepRunning() const;
 
     /***************Stimulus**************/
-    void lineDescription(const LineType& line);
-    void lineSequence(const LineType& line);
-    void lineEmpty(const LineType& line);
-    void eof();
+    inline void lineDescription(const LineType& line);
+    inline void lineSequence(const LineType& line);
+    inline void lineEmpty(const LineType& line);
+    inline void eof();
 
 private:
 

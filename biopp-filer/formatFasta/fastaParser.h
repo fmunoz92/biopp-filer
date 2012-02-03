@@ -36,23 +36,17 @@ class FastaParser
 {
 public:
 
-    FastaParser(const std::string& file_name)
-        : is(file_name.c_str())
-    {
-        if (!is.is_open())
-            throw FileNotFound(file_name);
-    }
-
-    bool getNextSequence(std::string& description, SequenceType& sequence);
+    inline FastaParser(const std::string& file_name);
+    inline bool getNextSequence(std::string& description, SequenceType& sequence);
 
 private:
 
-    void removeComment(std::string& line);
-    void removeFirstChar(std::string& line);
-    void removeWhiteSpace(std::string& line);
+    inline void removeComment(std::string& line);
+    inline void removeFirstChar(std::string& line);
+    inline void removeWhiteSpace(std::string& line);
 
-    void stimulateFastaMachine();
-    bool getNextSequence(std::string& description, std::string& sequence);
+    inline void stimulateFastaMachine();
+    inline bool getNextSequence(std::string& description, std::string& sequence);
 
     std::ifstream is;
     FastaMachine fsm;

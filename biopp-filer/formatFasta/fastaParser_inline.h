@@ -28,7 +28,15 @@ namespace bioppFiler
 {
 
 template<class SequenceType>
-void FastaParser<SequenceType>::removeComment(std::string& line)
+inline FastaParser<SequenceType>::FastaParser(const std::string& file_name)
+    : is(file_name.c_str())
+{
+    if (!is.is_open())
+        throw FileNotFound(file_name);
+}
+
+template<class SequenceType>
+inline void FastaParser<SequenceType>::removeComment(std::string& line)
 {
     const std::string::size_type commentPosistion = line.find_first_of(";");
     if (commentPosistion != std::string::npos)
@@ -36,19 +44,19 @@ void FastaParser<SequenceType>::removeComment(std::string& line)
 }
 
 template<class SequenceType>
-void FastaParser<SequenceType>::removeFirstChar(std::string& line)
+inline void FastaParser<SequenceType>::removeFirstChar(std::string& line)
 {
     line = line.substr(1, line.size());
 }
 
 template<class SequenceType>
-void FastaParser<SequenceType>::removeWhiteSpace(std::string& line)
+inline void FastaParser<SequenceType>::removeWhiteSpace(std::string& line)
 {
     line = mili::trim(line);
 }
 
 template<class SequenceType>
-void FastaParser<SequenceType>::stimulateFastaMachine()
+inline void FastaParser<SequenceType>::stimulateFastaMachine()
 {
     std::string line;
 
@@ -74,7 +82,7 @@ void FastaParser<SequenceType>::stimulateFastaMachine()
 }
 
 template<class SequenceType>
-bool FastaParser<SequenceType>::getNextSequence(std::string& description, SequenceType& sequence)
+inline bool FastaParser<SequenceType>::getNextSequence(std::string& description, SequenceType& sequence)
 {
     std::string sequenceString;//for type conversion
     const bool result = getNextSequence(description, sequenceString);
@@ -85,7 +93,7 @@ bool FastaParser<SequenceType>::getNextSequence(std::string& description, Sequen
 }
 
 template<class SequenceType>
-bool FastaParser<SequenceType>::getNextSequence(std::string& description, std::string& sequence)
+inline bool FastaParser<SequenceType>::getNextSequence(std::string& description, std::string& sequence)
 {
     description.clear();
     sequence.clear();
