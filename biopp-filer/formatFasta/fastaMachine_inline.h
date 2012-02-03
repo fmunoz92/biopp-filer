@@ -21,11 +21,92 @@ fastaMachine_inline.h: load and save sequences(NucSequence, PseudonucSequence, a
 */
 
 #ifndef FASTA_MACHINE_INLINE_H
-#error Internal header file, DO NOT include this.
+#error Internal header file, DO NOT include this, instead include "fastaMachine.h"
 #endif
 
 namespace bioppFiler
 {
+
+class FastaMachine::State //abstract interface
+{
+protected:
+    FastaMachine* const fsm;
+public:
+    State(FastaMachine* fm)
+        : fsm(fm)
+    {}
+    virtual ~State()
+    {}
+    virtual const State* lineDescription(const LineType& line) const = 0;
+    virtual const State* lineSequence(const LineType& line) const = 0;
+    virtual const State* lineEmpty() const = 0;
+    virtual const State* eof() const = 0;
+};
+
+class FastaMachine::WaitingForDescription : public State
+{
+public:
+    WaitingForDescription(FastaMachine* fm)
+        : State(fm)
+    {}
+    const State* lineDescription(const LineType& line) const;
+    const State* lineSequence(const LineType& line) const;
+    const State* lineEmpty() const;
+    const State* eof() const;
+};
+
+class FastaMachine::WaitingForSequence : public State
+{
+public:
+    WaitingForSequence(FastaMachine* fm)
+        : State(fm)
+    {}
+    const State* lineDescription(const LineType& line) const;
+    const State* lineSequence(const LineType& line) const;
+    const State* lineEmpty() const;
+    const State* eof() const;
+};
+
+class FastaMachine::ReadingSequence : public State
+{
+public:
+    ReadingSequence(FastaMachine* fm)
+        : State(fm)
+    {}
+    const State* lineDescription(const LineType& line) const;
+    const State* lineSequence(const LineType& line) const;
+    const State* lineEmpty() const;
+    const State* eof() const;
+};
+
+class FastaMachine::EndOfFile : public State
+{
+public:
+    EndOfFile(FastaMachine* fm)
+        : State(fm)
+    {}
+    const State* lineDescription(const LineType& line) const;
+    const State* lineSequence(const LineType& line) const;
+    const State* lineEmpty() const;
+    const State* eof() const;
+};
+
+FastaMachine::FastaMachine()
+    : waitingForDescription(new WaitingForDescription(this)),
+      waitingForSequence(new WaitingForSequence(this)),
+      readingSequence(new ReadingSequence(this)),
+      endOfFile(new EndOfFile(this)),
+      current(waitingForDescription),
+      running(true)
+{}
+
+FastaMachine::~FastaMachine()
+{
+    delete waitingForSequence;
+    delete waitingForDescription;
+    delete readingSequence;
+    delete endOfFile;
+}
 
 inline void FastaMachine::yield()
 {

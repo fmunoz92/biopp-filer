@@ -35,26 +35,12 @@ public:
     typedef std::string LineType;
     typedef std::string Sequence;
 
-    FastaMachine()
-        : waitingForDescription(new WaitingForDescription(this)),
-          waitingForSequence(new WaitingForSequence(this)),
-          readingSequence(new ReadingSequence(this)),
-          endOfFile(new EndOfFile(this)),
-          current(waitingForDescription),
-          running(true)
-    {}
+    FastaMachine();
+    ~FastaMachine();
 
-    ~FastaMachine()
-    {
-        delete waitingForSequence;
-        delete waitingForDescription;
-        delete readingSequence;
-        delete endOfFile;
-    }
-
-    void setCurrentSequence(Sequence& seq, LineType& des);
-    bool isValidSequence() const;
-    bool keepRunning() const;
+    inline void setCurrentSequence(Sequence& seq, LineType& des);
+    inline bool isValidSequence() const;
+    inline bool keepRunning() const;
 
     /***************Stimulus**************/
     void lineDescription(const LineType& line);
@@ -64,79 +50,21 @@ public:
 
 private:
 
-    class State //abstract interface
-    {
-    protected:
-        FastaMachine* const fsm;
-    public:
-        State(FastaMachine* fm)
-            : fsm(fm)
-        {}
-        virtual ~State()
-        {}
-        virtual const State* lineDescription(const LineType& line) const = 0;
-        virtual const State* lineSequence(const LineType& line) const = 0;
-        virtual const State* lineEmpty() const = 0;
-        virtual const State* eof() const = 0;
-    };
-
-    class WaitingForDescription : public State
-    {
-    public:
-        WaitingForDescription(FastaMachine* fm)
-            : State(fm)
-        {}
-        const State* lineDescription(const LineType& line) const;
-        const State* lineSequence(const LineType& line) const;
-        const State* lineEmpty() const;
-        const State* eof() const;
-    };
-
-    class WaitingForSequence : public State
-    {
-    public:
-        WaitingForSequence(FastaMachine* fm)
-            : State(fm)
-        {}
-        const State* lineDescription(const LineType& line) const;
-        const State* lineSequence(const LineType& line) const;
-        const State* lineEmpty() const;
-        const State* eof() const;
-    };
-
-    class ReadingSequence : public State
-    {
-    public:
-        ReadingSequence(FastaMachine* fm)
-            : State(fm)
-        {}
-        const State* lineDescription(const LineType& line) const;
-        const State* lineSequence(const LineType& line) const;
-        const State* lineEmpty() const;
-        const State* eof() const;
-    };
-
-    class EndOfFile : public State
-    {
-    public:
-        EndOfFile(FastaMachine* fm)
-            : State(fm)
-        {}
-        const State* lineDescription(const LineType& line) const;
-        const State* lineSequence(const LineType& line) const;
-        const State* lineEmpty() const;
-        const State* eof() const;
-    };
+    class State; //abstract interface
+    class WaitingForDescription;
+    class WaitingForSequence;
+    class ReadingSequence;
+    class EndOfFile;
 
     /*
      * return sequence and description to currents
      */
-    void yield();
+    inline void yield();
 
     /*
      * reset flags for keepRunning(Sequence*, LineType*)
      */
-    void resetFlags();
+    inline void resetFlags();
 
     const State* const waitingForDescription;
     const State* const waitingForSequence;
