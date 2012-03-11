@@ -143,12 +143,12 @@ TEST(FastaFormatTest, Load)
     fp.getNextSequence(title2, seq2);
     fp.getNextSequence(title3, seq3);
 
-    ASSERT_EQ("ATCGAATCGATCGTCG", seq1.getString());
+    ASSERT_EQ("AUCGAAUCGAUCGUCG", seq1.getString());
     ASSERT_EQ("SEQUENCE_1", title1);
 
     ASSERT_EQ("sequence_2", title2);
-    ASSERT_EQ("AGGTGAGGTGAGGTG", seq2.getString());
+    ASSERT_EQ("AGGUGAGGUGAGGUG", seq2.getString());
 
-    ASSERT_EQ("ATTG", seq3.getString());
+    ASSERT_EQ("AUUG", seq3.getString());
     ASSERT_EQ("", title3);
 }

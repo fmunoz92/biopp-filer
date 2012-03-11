@@ -87,7 +87,7 @@ inline bool FastaParser<SequenceType>::getNextSequence(std::string& description,
     std::string sequenceString;//for type conversion
     const bool result = getNextSequence(description, sequenceString);
 
-    sequence = sequenceString;
+    sequence = SequenceType(sequenceString);
 
     return result;
 }
