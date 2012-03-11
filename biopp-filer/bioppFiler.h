@@ -6,7 +6,7 @@
 namespace bioppFiler
 {
 struct BioppFilerExceptionHierarchy {};
-typedef GenericException<BioppFilerExceptionHierarchy> BioppFilerException;
+typedef mili::GenericException<BioppFilerExceptionHierarchy> BioppFilerException;
 
 DEFINE_SPECIFIC_EXCEPTION(FileNotFound, BioppFilerException);
 DEFINE_SPECIFIC_EXCEPTION(FileError, BioppFilerException);
