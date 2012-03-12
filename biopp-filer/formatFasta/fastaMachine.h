@@ -45,7 +45,7 @@ public:
     /***************Stimulus**************/
     inline void lineDescription(const LineType& line);
     inline void lineSequence(const LineType& line);
-    inline void lineEmpty(const LineType& line);
+    inline void lineEmpty();
     inline void eof();
 
 private:

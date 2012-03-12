@@ -67,7 +67,7 @@ inline void FastaParser<SequenceType>::stimulateFastaMachine()
 
         if (line.empty())
         {
-            fsm.lineEmpty(line);
+            fsm.lineEmpty();
         }
         else if (line[0] == '>')
         {

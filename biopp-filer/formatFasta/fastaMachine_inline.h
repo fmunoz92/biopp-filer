@@ -148,7 +148,7 @@ inline void FastaMachine::lineSequence(const LineType& line)
     current = current->lineSequence(line);
 }
 
-inline void FastaMachine::lineEmpty(const LineType&)
+inline void FastaMachine::lineEmpty()
 {
     resetFlags();
     current = current->lineEmpty();
