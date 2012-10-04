@@ -29,10 +29,8 @@ namespace bioppFiler
 
 template<class SequenceType>
 inline FastaSaver<SequenceType>::FastaSaver(const std::string& file_name)
-    : os(file_name.c_str())
+    : os(file_name.c_str(), std::ios::out)
 {
-    if (!os.is_open())
-        throw FileNotFound(file_name);
 }
 
 template<class SequenceType>
