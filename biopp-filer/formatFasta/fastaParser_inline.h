@@ -24,6 +24,8 @@ fastaParser_inline.h: load and save sequences(NucSequence, PseudonucSequence, an
 #error Internal header file, DO NOT include this.
 #endif
 
+#include <iostream>
+
 namespace bioppFiler
 {
 
@@ -94,6 +96,7 @@ inline void FastaParser<SequenceType>::stimulateFastaMachine()
         }
         else
         {
+            std::cout << line << std::endl;
             if (isBadSequence(line))
                 throw InvalidSequenceError();
 
