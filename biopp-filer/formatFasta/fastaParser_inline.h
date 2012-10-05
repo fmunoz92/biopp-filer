@@ -24,8 +24,6 @@ fastaParser_inline.h: load and save sequences(NucSequence, PseudonucSequence, an
 #error Internal header file, DO NOT include this.
 #endif
 
-#include <iostream>
-
 namespace bioppFiler
 {
 
@@ -54,24 +52,8 @@ inline void FastaParser<SequenceType>::removeFirstChar(std::string& line)
 template<class SequenceType>
 inline void FastaParser<SequenceType>::removeWhiteSpace(std::string& line)
 {
-    line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
     line = mili::trim(line);
-}
-
-template<class SequenceType>
-inline bool FastaParser<SequenceType>::isBadSequence(std::string& line)
-{
-
-    bool error = false;
-    const std::string errorCharSet = "~";
-
-    for (size_t i = 0; i < errorCharSet.size(); ++i)
-    {
-        if (line.find(errorCharSet[i]) != std::string::npos)
-            error = true;
-    }
-
-    return error;
+    line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
 }
 
 template<class SequenceType>
@@ -81,7 +63,6 @@ inline void FastaParser<SequenceType>::stimulateFastaMachine()
 
     if (std::getline(is, line))
     {
-
         removeComment(line);
         removeWhiteSpace(line);
 
@@ -95,13 +76,7 @@ inline void FastaParser<SequenceType>::stimulateFastaMachine()
             fsm.lineDescription(line);
         }
         else
-        {
-            std::cout << line << std::endl;
-            if (isBadSequence(line))
-                throw InvalidSequenceError();
-
             fsm.lineSequence(line);
-        }
     }
     else
         fsm.eof();
