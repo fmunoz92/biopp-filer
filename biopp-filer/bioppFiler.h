@@ -32,6 +32,7 @@ typedef mili::GenericException<BioppFilerExceptionHierarchy> BioppFilerException
 
 DEFINE_SPECIFIC_EXCEPTION(FileNotFound, BioppFilerException);
 DEFINE_SPECIFIC_EXCEPTION(FileError, BioppFilerException);
+DEFINE_SPECIFIC_EXCEPTION(InvalidSequenceError, BioppFilerException);
 }
 
 #include "formatFasta/fastaSaver.h"
