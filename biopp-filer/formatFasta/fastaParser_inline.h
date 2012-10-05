@@ -53,6 +53,7 @@ template<class SequenceType>
 inline void FastaParser<SequenceType>::removeWhiteSpace(std::string& line)
 {
     line = mili::trim(line);
+    line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
 }
 
 template<class SequenceType>
