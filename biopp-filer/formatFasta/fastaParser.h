@@ -44,6 +44,7 @@ private:
     inline void removeComment(std::string& line);
     inline void removeFirstChar(std::string& line);
     inline void removeWhiteSpace(std::string& line);
+    inline bool isBadSequence(std::string& line);
 
     inline void stimulateFastaMachine();
     inline bool getNextSequence(std::string& description, std::string& sequence);
