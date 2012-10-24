@@ -112,6 +112,7 @@ inline bool FastaParser<SequenceType>::getNextSequence(std::string& description,
 template<class SequenceType>
 inline void FastaParser<SequenceType>::reset()
 {
+    is.clear();
     is.seekg(0, std::ios::beg);
     fsm.reset();
 }

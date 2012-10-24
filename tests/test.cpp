@@ -121,32 +121,33 @@ TEST(FastaFormatTest, Reset)
 
     fs.saveNextSequence(titleSave1, sequenceSave1);
     fs.saveNextSequence(titleSave2, sequenceSave2);
+    fs.saveNextSequence(titleSave2, sequenceSave2);
 
     /*******************Load**************************/
     FastaParser<biopp::NucSequence> fp(file);
 
-    biopp::NucSequence sequenceLoad1First;
-    biopp::NucSequence sequenceLoad1Second;
+    biopp::NucSequence sequenceLoad1;
     biopp::NucSequence sequenceLoad2;
+    biopp::NucSequence sequenceLoadAux;
 
-    std::string titleLoad1First;
-    std::string titleLoad1Second;
+    std::string titleLoad1;
     std::string titleLoad2;
+    std::string titleLoadAux;
 
-    fp.getNextSequence(titleLoad1First, sequenceLoad1First);
+    while(fp.getNextSequence(titleLoadAux, sequenceLoadAux))
+    {}
     fp.reset();
-    fp.getNextSequence(titleLoad1Second, sequenceLoad1Second);
+
+    fp.getNextSequence(titleLoad1, sequenceLoad1);
     fp.getNextSequence(titleLoad2, sequenceLoad2);
 
     /*******************Compare************************/
-    ASSERT_EQ(sequenceLoad1First, sequenceLoad1Second); 
-    ASSERT_EQ(titleLoad1First, titleLoad1Second);
-    
-    ASSERT_EQ(titleLoad1First, titleSave1);
-    ASSERT_EQ(sequenceLoad1First, sequenceSave1);
 
-    ASSERT_EQ(sequenceLoad2, sequenceSave2); 
+    ASSERT_EQ(titleLoad1, titleSave1);
+    ASSERT_EQ(sequenceLoad1, sequenceSave1);
+
     ASSERT_EQ(titleLoad2, titleSave2);
+    ASSERT_EQ(sequenceLoad2, sequenceSave2);
 }
 
 
