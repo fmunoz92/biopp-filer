@@ -108,6 +108,12 @@ inline FastaMachine::~FastaMachine()
     delete endOfFile;
 }
 
+inline void FastaMachine::reset()
+{
+    current = waitingForDescription;
+    running = true;
+}
+
 inline void FastaMachine::yield()
 {
     *currentDescription = description;
@@ -119,6 +125,7 @@ inline void FastaMachine::resetFlags()
 {
     running = true;
 }
+
 
 inline void FastaMachine::setCurrentSequence(Sequence& seq, LineType& des)
 {
