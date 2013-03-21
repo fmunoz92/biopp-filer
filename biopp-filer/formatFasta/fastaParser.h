@@ -38,6 +38,7 @@ public:
 
     inline FastaParser(const std::string& file_name);
     inline bool getNextSequence(std::string& description, SequenceType& sequence);
+    inline void reset();
 
 private:
 

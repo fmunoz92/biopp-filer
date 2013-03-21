@@ -41,6 +41,7 @@ public:
     inline void setCurrentSequence(Sequence& seq, LineType& des);
     inline bool isValidSequence() const;
     inline bool keepRunning() const;
+    inline void reset();
 
     /***************Stimulus**************/
     inline void lineDescription(const LineType& line);

@@ -106,6 +106,50 @@ TEST(FastaFormatTest, LoadSaveWithoutDescription)
     ASSERT_EQ(std::string(""), titleLoad3);
 }
 
+TEST(FastaFormatTest, Reset)
+{
+    const std::string file("reset.txt");
+
+    /******************Save****************************/
+    const biopp::NucSequence sequenceSave1("ATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCG");
+    const biopp::NucSequence sequenceSave2("GAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCGTCGATCGAATCGATCG");
+
+    const std::string titleSave1("sequence 1");
+    const std::string titleSave2("sequence 2");
+
+    FastaSaver<biopp::NucSequence>  fs(file);
+
+    fs.saveNextSequence(titleSave1, sequenceSave1);
+    fs.saveNextSequence(titleSave2, sequenceSave2);
+    fs.saveNextSequence(titleSave2, sequenceSave2);
+
+    /*******************Load**************************/
+    FastaParser<biopp::NucSequence> fp(file);
+
+    biopp::NucSequence sequenceLoad1;
+    biopp::NucSequence sequenceLoad2;
+    biopp::NucSequence sequenceLoadAux;
+
+    std::string titleLoad1;
+    std::string titleLoad2;
+    std::string titleLoadAux;
+
+    while(fp.getNextSequence(titleLoadAux, sequenceLoadAux))
+    {}
+    fp.reset();
+
+    fp.getNextSequence(titleLoad1, sequenceLoad1);
+    fp.getNextSequence(titleLoad2, sequenceLoad2);
+
+    /*******************Compare************************/
+
+    ASSERT_EQ(titleLoad1, titleSave1);
+    ASSERT_EQ(sequenceLoad1, sequenceSave1);
+
+    ASSERT_EQ(titleLoad2, titleSave2);
+    ASSERT_EQ(sequenceLoad2, sequenceSave2);
+}
+
 
 
 TEST(FastaFormatTest, Load)
