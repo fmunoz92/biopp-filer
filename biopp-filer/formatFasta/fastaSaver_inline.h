@@ -73,4 +73,10 @@ inline void FastaSaver<SequenceType>::saveDescription(const std::string& title)
     os << ">" << title << std::endl;
 }
 
+template<class SequenceType>
+inline void FastaSaver<SequenceType>::close()
+{
+    os.close();
+}
+
 }
