@@ -134,7 +134,7 @@ TEST(FastaFormatTest, Reset)
     std::string titleLoad2;
     std::string titleLoadAux;
 
-    while(fp.getNextSequence(titleLoadAux, sequenceLoadAux))
+    while (fp.getNextSequence(titleLoadAux, sequenceLoadAux))
     {}
     fp.reset();
 

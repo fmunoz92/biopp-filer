@@ -46,7 +46,7 @@ private:
 
     inline void saveSequence(const SequenceType& seq);
     inline void saveDescription(const std::string& des);
-	inline void close();
+    inline void close();
 
 };
 }
