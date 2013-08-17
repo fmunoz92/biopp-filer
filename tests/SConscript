@@ -1,8 +1,8 @@
-Import ('env')
+Import('env')
 
 name = 'biopp-filer'
 inc = env.Dir('.')
 src = env.Glob('*.cpp')
-deps = ['biopp-filer','mili', 'biopp','gmock','gtest_main', 'gtest']
+deps = ['mili', 'biopp','gmock','gtest_main', 'gtest']
 
 env.CreateTest(name, inc, src, deps)
