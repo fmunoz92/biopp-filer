@@ -195,7 +195,7 @@ inline const FastaMachine::State* FastaMachine::WaitingForDescription::eof() con
 
 inline const FastaMachine::State* FastaMachine::WaitingForSequence::lineDescription(const LineType&) const
 {
-    throw FileError(string("WaitingForSequence, Expected lineSequence"));
+    throw FileError("WaitingForSequence, Expected lineSequence");
 }
 
 inline const FastaMachine::State* FastaMachine::WaitingForSequence::lineSequence(const LineType& line) const
@@ -207,12 +207,12 @@ inline const FastaMachine::State* FastaMachine::WaitingForSequence::lineSequence
 
 inline const FastaMachine::State* FastaMachine::WaitingForSequence::lineEmpty() const
 {
-    throw FileError(string("WaitingForSequence, Expected lineSequence"));
+    throw FileError("WaitingForSequence, Expected lineSequence");
 }
 
 inline const FastaMachine::State* FastaMachine::WaitingForSequence::eof() const
 {
-    throw FileError(string("WaitingForSequence, Expected lineSequence"));
+    throw FileError("WaitingForSequence, Expected lineSequence");
 }
 
 inline const FastaMachine::State* FastaMachine::ReadingSequence::lineDescription(const LineType& line) const
